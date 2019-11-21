@@ -1,0 +1,61 @@
+---
+- hosts: local
+  connection: local
+  vars:
+          instance_type: t2.micro
+          security_group: sg-092dd498f29bf0362
+          image: ami-00379ec40a3e30f87
+          keypair: satish-aws-hpe-seoul
+          region: ap-northeast-2
+          count: 1
+  tasks: 
+  - ec2: 
+      count: "{{count}}"
+      group_id: "{{ security_group }}"
+      image: "{{ image }}"
+      instance_type: "{{ instance_type }}"
+      keypair: "{{ keypair }}"
+      region: "{{ region }}"
+      wait: true
+    name: "Launch the new EC2 Instance"
+    register: ec2
+
+  - add_host:
+      name: "{{ item.public_ip }}"
+      groups: webservers
+    with_items: "{{ ec2.instances }}"
+  
+  - name: Add tag to Instance(s)
+    ec2_tag:
+      resource: "{{ item.id }}" 
+      region: "{{ region }}" 
+      state: "present"
+    with_items: "{{ ec2.instances }}"
+    args:
+      tags:
+        Type: webserver
+
+  - name: "Wait for SSH to come up"
+    wait_for:
+       timeout: 60
+    delegate_to: localhost
+
+- hosts: webservers
+  remote_user: ubuntu
+  become: yes
+  gather_facts: no
+  pre_tasks:
+     - name: 'install python'
+       raw: 'sudo apt-get update && sudo apt-get -y install python'
+  tasks:
+      - name: Install Apache
+        apt:
+          name: apache2
+          state: present
+      - service: 
+          name: apache2
+          state: started
+          enabled: yes
+  post_tasks: 
+    - name: 'setup page'
+      raw: 'echo Hello >> /var/www/html/app.html'
