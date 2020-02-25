@@ -1,0 +1,18 @@
+# Maintainer - Satish Balakrishnan
+# Add a kubeuser and assign passwordless sudo
+- hosts: all
+  become: yes
+  tasks:
+    - name: create the 'kubeuser'
+      user: name=kubeuser append=yes state=present createhome=yes shell=/bin/bash
+
+    - name: make 'kubeuser' to sudo without password
+      lineinfile:
+        dest: /etc/sudoers
+        line: 'kubeuser ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+
+    - name: set up keys for 'kubeuser'
+      authorized_key: user=kubeuser key="{{item}}"
+      with_file:
+        - ~/.ssh/id_rsa.pub
