@@ -1,0 +1,28 @@
+---
+- name: Get Softwares Windows
+  hosts: windows
+  any_errors_fatal: false
+  tasks:
+   - win_copy:
+       src: /root/sysinfo-get/getRemoteSoftwareList.ps1
+       dest: C:\getRemoteSoftwareList.ps1
+   - win_shell: C:\getRemoteSoftwareList.ps1 > C:\SoftwareList
+   - fetch:
+       src: C:\SoftwareList 
+       dest: /tmp/fetched
+
+- name: Get Software RHEL
+  hosts: rhel
+  tasks:
+   - shell: yum list installed > /tmp/SoftwareList
+   - fetch:
+      src: /tmp/SoftwareList
+      dest: /tmp/fetched
+
+- name: Send files to Central Repo
+  hosts: centralrepo
+  tasks: 
+  - copy:
+     src: /tmp/fetched/
+     dest: /tmp/central-repo/fetched
+

@@ -1,0 +1,9 @@
+[windows]
+xxx.xxx.xxx.xxx ansible_host=xxx.xxx.xxx.xxx ansible_connection=winrm ansible_user=administrator ansible_password=password ansible_winrm_server_cert_validation=ignore
+
+[rhel]
+xx.xx.xx.xx ansible_host=xx.xx.xx.xx ansible_user=ec2-user ansible_password=password
+
+[centralrepo]
+xxx.xxx.xxx.xxx  ansible_host=xxx.xxx.xxx.xxx ansible_user=ec2-user ansible_password=password
+
