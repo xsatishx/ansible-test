@@ -1,0 +1,81 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.1.20|task01
+  shell: /bin/mount | /usr/bin/egrep "^\s*.*\s\s*\/m.*\/(floppy|cdrom|corder)" | awk '{print} END {if (NR == 0) print "passed"}'
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance or is_remediate
+
+- name: 1.1.20|task02
+  shell: /bin/mount | /usr/bin/egrep "^\s*.*\s\s*\/m.*\/(floppy|cdrom|corder)" | /usr/bin/egrep "\s.*[,]?noexec" | awk '{print} END {if (NR == 0) print "failed"}'
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task02
+  when: is_compliance or is_remediate
+
+- name: 1.1.20|Ensure noexec option set on removable media partitions
+  moveit:
+    section: 1.1.20
+    description: Ensure noexec option set on removable media partitions
+    info: |
+      <pre class="primary">
+      Run the following command and verify that the nodev option is set on all removable media partitions.
+      </pre>
+      <pre class="secondary">
+      # mount
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      /bin/mount | egrep "^\s*.*\s\s*\/m.*\/(floppy|cdrom|corder)"
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout_lines | difference(["passed"]) | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if 'passed' in task01.stdout_lines or 'failed' not in task02.stdout_lines else 'failed'}}"
+  when: is_compliance
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.1.20|Ensure noexec option set on removable media partitions
+  moveit:
+    section: 1.1.20
+    description: Ensure noexec option set on removable media partitions
+    info: |
+      <pre class="primary">
+      Edit the /etc/fstab file and add noexec to the fourth field (mounting options) of all removable media partitions. Look for entries that have mount points that contain words such as floppy or cdrom. See the fstab(5) manual page for more information.
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      Manual intervention required for partition-related controls.
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if 'passed' in task01.stdout_lines or 'failed' not in task02.stdout_lines else 'manual'}}"
+  when: is_remediate
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation

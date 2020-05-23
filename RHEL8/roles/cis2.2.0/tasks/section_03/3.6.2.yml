@@ -1,0 +1,41 @@
+---
+
+- name: 3.6.2|Ensure default deny firewall policy 
+  lineinfile:
+    path: /etc/firewalld/firewalld.conf
+    regexp: "^DefaultZone"
+    line: "DefaultZone=drop"
+  when: cis_firewall == "firewalld"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE  
+
+- name: 3.6.2|Ensure default deny firewall policy 
+  firewalld:
+    state: enabled
+    zone: drop
+    permanent: true
+  when: cis_firewall == "firewalld"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE  
+
+# iptables
+- name: 3.6.2|Ensure default deny firewall policy 
+  iptables:
+    chain: "{{item}}"
+    policy: DROP
+  with_items:
+    - INPUT
+    - FORWARD
+    - OUTPUT
+  when: cis_firewall == "iptables"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE   

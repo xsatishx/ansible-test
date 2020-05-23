@@ -1,0 +1,48 @@
+---
+
+- name: 6.2.11|Ensure no users have .forward files
+  file:
+    state: absent
+    dest: "~{{ item }}/.forward"
+  when: item not in cis_skip_user_dir
+  with_items: "{{ users.stdout_lines }}"
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE
+
+# - name: 6.2.11|Ensure no users have .forward files
+#   script: audit_6.2.11.sh
+#   check_mode: no
+#   changed_when: False
+#   register: audit_6_2_11
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE
+
+# - name: 6.2.11|Ensure no users have .forward files
+#   fail:
+#     msg: "{{ audit_6_2_11.stdout_lines }}"
+#   when:
+#     - audit_6_2_11.stdout_lines is defined and audit_6_2_11.stdout_lines|length > 0
+#     - fail_on_manual_remediation_actions
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE
+
+# - name: 6.2.11|Ensure no users have .forward files
+#   debug:
+#     msg: "{{ audit_6_2_11.stdout_lines }}"
+#   when:
+#     - audit_6_2_11.stdout_lines is defined and audit_6_2_11.stdout_lines|length > 0
+#     - not fail_on_manual_remediation_actions
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE

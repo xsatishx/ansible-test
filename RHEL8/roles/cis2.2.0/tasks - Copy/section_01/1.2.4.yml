@@ -1,0 +1,75 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.2.4|task01
+  shell: /usr/bin/subscription-manager identity
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance
+
+- name: 1.2.4|Ensure Red Hat Subscription Manager connection is configured
+  moveit:
+    section: 1.2.4
+    description: Ensure Red Hat Subscription Manager connection is configured
+    info: |
+      <pre class="primary">
+      Verify your system is connected to the Red Hat Subscription Manager.
+      If connected to RHSM your systemID can be retrieved with the following command:
+      </pre>
+      <pre class="secondary">
+      # subscription-manager identity
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      subscription-manager identity
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if task01.rc == 0 else 'failed' }}"
+  when: is_compliance
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.2.4|Ensure Red Hat Subscription Manager connection is configured
+  moveit:
+    section: 1.2.4
+    description: Ensure Red Hat Subscription Manager connection is configured
+    info: |
+      <pre class="primary">
+      Run the following command to connect to the Red Hat Subscription Manager:
+      </pre>
+      <pre class="secondary">
+      # subscription-manager register
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      Manual Intervention Required.
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "manual"
+  when: is_remediate
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation

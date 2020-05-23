@@ -1,0 +1,31 @@
+---
+
+- name: 5.3.4|Ensure password hashing algorithm is SHA-512  
+  pamd:
+    name: system-auth
+    type: password
+    control: sufficient
+    module_path: pam_unix.so
+    module_arguments: 
+      - "{{ cis_lockout['passwd_hash']|trim }}"
+    state: args_present
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 
+
+- name: 5.3.4|Ensure password hashing algorithm is SHA-512  
+  pamd:
+    name: password-auth
+    type: password
+    control: sufficient
+    module_path: pam_unix.so
+    module_arguments: 
+      - "{{ cis_lockout['passwd_hash']|trim }}"
+    state: args_present
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE  

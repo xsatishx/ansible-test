@@ -1,0 +1,69 @@
+---
+
+- name: 2.2.1.1|Ensure time synchronization is in use
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  when: cis_time_synchronization == "ntp"
+  with_items:
+    - { name: "ntp", state: "present" }
+    - { name: "chrony", state: "absent" }
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE
+
+- name: 2.2.1.1|Ensure time synchronization is in use
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  when: cis_time_synchronization == "chrony"
+  with_items:
+    - { name: "ntp", state: "absent" }
+    - { name: "chrony", state: "present" }
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE
+
+- name: 2.2.1.1|Ensure time synchronization is in use
+  service:
+    name: "{{ cis_time_synchronization_service }}"
+    state: started
+    enabled: yes
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE
+
+- name: 2.2.1.1|Ensure time synchronization is in use
+  service:
+    name: ntpd
+    state: stopped
+    enabled: no
+  when:
+      - cis_time_synchronization == "chrony" 
+      - ntpd_service_status.stdout == "loaded"
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE
+
+- name: 2.2.1.1|Ensure time synchronization is in use
+  service:
+    name: chronyd
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+  when:
+      - cis_time_synchronization == "ntp" 
+      - chronyd_service_status.stdout == "loaded"
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE  

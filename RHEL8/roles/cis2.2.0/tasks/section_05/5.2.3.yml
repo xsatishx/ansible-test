@@ -1,0 +1,14 @@
+---
+
+- name: 5.2.3|Ensure SSH LogLevel is set to INFO 
+  lineinfile:
+    state: present
+    path: /etc/ssh/sshd_config
+    regexp: "(?i)^(#)?LogLevel\\s+"
+    line: 'LogLevel INFO'
+  notify: restart sshd    
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 

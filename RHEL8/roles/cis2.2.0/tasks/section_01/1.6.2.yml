@@ -1,0 +1,90 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.6.2|task01
+  shell: rpm -q libselinux
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance
+
+- name: 1.6.2|task02
+  set_fact:
+    is_installed: '{{ not task01.stdout is regex("not installed") }}'
+  when: is_compliance
+
+- name: 1.6.2|Ensure SELinux is installed
+  moveit:
+    section: 1.6.2
+    description: Ensure SELinux is installed
+    info: |
+      <pre class="primary">
+      Run the following command and verify libselinux is installed:
+      </pre>
+      <pre class="secondary">
+      # rpm -q libselinux
+      libselinux-<version>
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      rpm -q libselinux
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if is_installed else 'failed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.6.2|task03
+  yum:
+    name: libselinux
+    state: present
+  register: task03
+  when: is_remediate
+
+- name: 1.6.2|Ensure SELinux is installed
+  moveit:
+    section: 1.6.2
+    description: Ensure SELinux is installed
+    info: |
+      <pre class="primary">
+      Run the following command to install libselinux :
+      </pre>
+      <pre class="secondary">
+      # yum install libselinux
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      Following command executed
+      </pre>
+      <pre class="secondary">
+      yum install libselinux
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'changed' if task03.changed else 'passed' }}"
+  when: is_remediate
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation

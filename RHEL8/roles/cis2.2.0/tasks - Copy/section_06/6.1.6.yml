@@ -1,0 +1,13 @@
+---
+
+- name: 6.1.6|Ensure permissions on /etc/passwd- are configured 
+  file:
+    dest: /etc/passwd-
+    owner: root
+    group: root
+    mode: 0600
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE

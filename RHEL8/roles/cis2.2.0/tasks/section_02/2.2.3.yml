@@ -1,0 +1,13 @@
+---
+
+- name: 2.2.3|Ensure Avahi Server is not enabled 
+  service:
+    name: avahi-daemon
+    state: stopped
+    enabled: no
+  when: avahi_service_status.stdout == "loaded"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE

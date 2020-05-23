@@ -1,0 +1,82 @@
+###############
+#    Audit    #
+###############
+
+- name: 1.2.3|task01
+  shell: /usr/bin/rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --> %{summary}\n'
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance
+
+- name: 1.2.3|task02
+  shell: (/usr/bin/rpm -q gpg-pubkey --queryformat '%{name}-%{version}-%{release} --> %{summary}\n') | /usr/bin/egrep "^gpg-pubkey(-[a-f0-9]{8}){2} --> gpg\(Red\s\s*Hat,\s\s*Inc\.\s\s*\(release\s\s*key\s*.*\)\s\s*<security@redhat\.com>[\)]?" 2> /dev/null | awk '{print} END {if (NR == 0) print "failed" ; else print "passed"}'
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task02
+  when: is_compliance
+
+- name: 1.2.3|Ensure GPG keys are configured
+  moveit:
+    section: 1.2.3
+    description: Ensure GPG keys are configured
+    info: |
+      <pre class="primary">
+      Run the following command and verify GPG keys are configured correctly:
+      </pre>
+      <pre class="secondary">
+      # rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --> %{summary}\n'
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --> %{summary}\n'
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'failed' if 'failed' in task02.stdout_lines else 'passed' }}"
+  when: is_compliance
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.2.3|Ensure GPG keys are configured
+  moveit:
+    section: 1.2.3
+    description: Ensure GPG keys are configured
+    info: |
+      <pre class="primary">
+      Update your package manager GPG keys in accordance with site policy.
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      Manual Intervention Required.
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "manual"
+  when: is_remediate
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+
+# gpg --quiet --with-fingerprint /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+# https://linuxconfig.org/how-to-list-import-and-remove-archive-signing-keys-on-centos-7

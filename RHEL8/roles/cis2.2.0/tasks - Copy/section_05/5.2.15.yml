@@ -1,0 +1,14 @@
+---
+
+- name: 5.2.15|Ensure SSH warning banner is configured 
+  lineinfile:
+    state: present
+    path: /etc/ssh/sshd_config
+    regexp: "(?i)^(#)?Banner\\s+"
+    line: 'Banner /etc/issue.net'
+  notify: restart sshd 
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 

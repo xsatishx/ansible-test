@@ -1,0 +1,15 @@
+---
+
+- name: 4.1.11|Ensure unsuccessful unauthorized file access attempts are collected 
+  template:
+    src: audit/rhel7cis_rule_4_1_11.rules.j2
+    dest: /etc/audit/rules.d/rhel7cis_rule_4_1_11.rules
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart auditd
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation
+    - RULE  

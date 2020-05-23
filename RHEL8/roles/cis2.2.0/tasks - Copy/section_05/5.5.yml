@@ -1,0 +1,14 @@
+---
+
+- name: 5.5|Ensure root login is restricted to system console 
+  template:
+    src: 'etc/securetty.j2'
+    dest: '/etc/securetty'
+    owner: 'root'
+    group: 'root'
+    mode: '0400'    
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 

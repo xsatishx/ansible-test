@@ -1,0 +1,13 @@
+---
+
+- name: 2.2.13|Ensure HTTP Proxy Server is not enabled 
+  service:
+    name: squid
+    state: stopped
+    enabled: no   
+  when: squid_service_status.stdout == "loaded"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE

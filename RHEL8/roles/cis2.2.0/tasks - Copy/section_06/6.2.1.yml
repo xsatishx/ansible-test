@@ -1,0 +1,31 @@
+---
+
+- name: 6.2.1|Ensure password fields are not empty 
+  shell: passwd -l {{ item }}
+  changed_when: no
+  failed_when: no
+  check_mode: no  
+  with_items: "{{ empty_password_accounts.stdout_lines }}"
+  when: 
+    - empty_password_accounts.stdout_lines is defined
+    - empty_password_accounts.stdout_lines|length > 0
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 
+
+- name: 6.2.1|Ensure password fields are not empty 
+  debug:
+    msg: "Following user accounts are locked: {{ empty_password_accounts.stdout_lines | join('\n') }}"
+  changed_when: yes
+  when: 
+    - empty_password_accounts.stdout_lines is defined
+    - empty_password_accounts.stdout_lines|length > 0
+
+- name: 6.2.1|Ensure password fields are not empty 
+  debug:
+    msg: "OK"
+  when:
+    - empty_password_accounts.stdout_lines is defined
+    - empty_password_accounts.stdout_lines|length == 0    

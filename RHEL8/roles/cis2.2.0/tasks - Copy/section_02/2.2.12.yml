@@ -1,0 +1,13 @@
+---
+
+- name: 2.2.12|Ensure Samba is not enabled 
+  service:
+    name: smb
+    state: stopped
+    enabled: no   
+  when: smb_service_status.stdout == "loaded"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE

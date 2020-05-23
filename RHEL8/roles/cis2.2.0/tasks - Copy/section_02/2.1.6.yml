@@ -1,0 +1,32 @@
+---
+
+- name: 2.1.6|Ensure tftp server is not enabled
+  stat:
+    path: /etc/xinetd.d/tftp
+  register: task_2_1_6_a
+  changed_when: no
+  tags:
+    - PRE_TASK
+
+- name: 2.1.6|Ensure tftp server is not enabled
+  shell: chkconfig --list tftp 2>/dev/null | grep -q "on" && echo "True" || echo "False"
+  when: task_2_1_6_a.stat.exists
+  register: task_2_1_6_b
+  changed_when: task_2_1_6_b.stdout == "True"
+  check_mode: no
+  tags:
+    - PRE_TASK
+
+- name: 2.1.6|Ensure tftp server is not enabled
+  shell: chkconfig tftp off
+  notify: restart xinetd
+  when: 
+    - task_2_1_6_a.stat.exists
+    - task_2_1_6_b.stdout == "True"            
+  check_mode: no
+  changed_when: no             
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE

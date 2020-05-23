@@ -1,0 +1,13 @@
+---
+
+- name: 2.2.9|Ensure FTP Server is not enabled 
+  service:
+    name: vsftpd
+    state: stopped
+    enabled: no   
+  when: vsftpd_service_status.stdout == "loaded"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE

@@ -1,0 +1,15 @@
+---
+
+- name: 3.2.8|Ensure TCP SYN Cookies is enabled 
+  sysctl:
+      name: net.ipv4.tcp_syncookies
+      value: '1'
+      sysctl_set: yes
+      state: present
+      reload: yes
+  notify: sysctl flush ipv4 route table
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE  

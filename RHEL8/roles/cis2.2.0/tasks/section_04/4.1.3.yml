@@ -1,0 +1,36 @@
+---
+
+- name: 4.1.3|Ensure auditing for processes that start prior to auditd is enabled 
+  shell: grep 'audit[[:space:]]*=[[:space:]]*[10]' /etc/default/grub
+  register: task_4_1_3
+  changed_when: no
+  check_mode: no
+  failed_when: false
+
+- name: 4.1.3|Ensure auditing for processes that start prior to auditd is enabled 
+  replace:
+    dest: /etc/default/grub
+    regexp: '(^GRUB_CMDLINE_LINUX\s*\=\s*)(?:")(.+)(?<!audit=1)(?:")'
+    replace: '\1"\2 audit=1"'
+    follow: yes
+  notify: generate new grub config
+  when: task_4_1_3.rc == 1
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation
+    - RULE   
+
+- name: 4.1.3|Ensure auditing for processes that start prior to auditd is enabled 
+  replace:
+    dest: /etc/default/grub
+    regexp: '(.+)(audit=\d)(.+)'
+    replace: '\1audit=1\3'
+    follow: yes
+  notify: generate new grub config
+  when: task_4_1_3.rc == 0
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation
+    - RULE  

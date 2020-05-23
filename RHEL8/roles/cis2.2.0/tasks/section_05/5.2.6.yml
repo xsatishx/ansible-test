@@ -1,0 +1,14 @@
+---
+
+- name: 5.2.6|Ensure SSH IgnoreRhosts is enabled 
+  lineinfile:
+    state: present
+    path: /etc/ssh/sshd_config
+    regexp: "(?i)^(#)?IgnoreRhosts\\s+"
+    line: 'IgnoreRhosts yes'
+  notify: restart sshd 
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 

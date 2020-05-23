@@ -1,0 +1,45 @@
+---
+
+- name: 1.1.5|set fact
+  set_fact:
+    tmp_partition_opt: "{{ tmp_partition_opt + ['noexec' ] }}"  
+  tags:
+    - SET_FACT
+
+- name: 1.1.5|Ensure noexec option set on /tmp partition
+  mount:
+    name: "{{ item.mount }}"
+    state: mounted
+    fstype: "{{ item.fstype }}"
+    src: "{{ item.device }}"
+    opts: "{{ item.options.split(',') | union(tmp_partition_opt) | join(',') }}"
+  when: 
+    - (item.mount == '/tmp')
+    - ('noexec' not in tmp_mountpoint_options)
+  with_items: "{{ tmp_mountpoints }}"    
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE   
+    - MANUAL
+    
+- name:
+  debug:
+    var: tmp_exist
+
+- name: 1.1.5|Ensure noexec option set on /tmp partition
+  debug:
+    msg: |
+      {% if tmp_exist %}
+        OK
+      {% else %}
+        Manually task
+      {% endif %}
+  changed_when: not tmp_exist
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE   
+    - MANUAL

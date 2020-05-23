@@ -1,0 +1,22 @@
+---
+
+- name: 5.1.1|Ensure cron daemon is enabled 
+  yum:
+    name: cronie
+    state: present
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 
+
+- name: 5.1.1|Ensure cron daemon is enabled 
+  service:
+    name: crond
+    enabled: yes
+    state: started
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 

@@ -1,0 +1,46 @@
+---
+
+- name: 6.2.9|Ensure users own their home directories
+  script: audit_6.2.9.sh
+  args: 
+    executable: bash -l
+  check_mode: no
+  changed_when: 
+    - audit_6_2_9.stdout_lines is defined 
+    - audit_6_2_9.stdout_lines|length > 1
+  register: audit_6_2_9
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 
+
+# - name: 6.2.9|Ensure users own their home directories
+#   fail:
+#     msg: "{{ audit_6_2_9.stdout_lines }}"
+#   when:
+#     - audit_6_2_9.stdout_lines is defined and audit_6_2_9.stdout_lines|length > 1
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE 
+
+- name: 6.2.9|Ensure users own their home directories
+  file:
+    owner: "{{ item.split(':')[1] }}"
+    path: "{{ item.split(':')[0] }}"
+    group: "{{ item.split(':')[1] }}"
+    state: directory
+    follow: yes
+  when: 
+    - audit_6_2_9.stdout_lines is defined 
+    - audit_6_2_9.stdout_lines|length > 1
+    - item != ""
+    - ('FAILED' not in item)
+  with_items: "{{ audit_6_2_9.stdout_lines }}"
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 

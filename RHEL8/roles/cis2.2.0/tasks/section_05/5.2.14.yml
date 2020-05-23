@@ -1,0 +1,57 @@
+---
+
+- name: 5.2.14|Ensure SSH access is limited 
+  lineinfile:
+    state: present
+    path: /etc/ssh/sshd_config
+    regexp: "(?i)^AllowUsers\\s+"
+    line: AllowUsers {{ cis_sshd['allowusers'] }}
+  when: cis_sshd['allowusers'] is defined and cis_sshd['allowusers']|trim != "" | default('')
+  notify: restart sshd 
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 
+
+- name: 5.2.14|Ensure SSH access is limited 
+  lineinfile:
+    state: present
+    path: /etc/ssh/sshd_config
+    regexp: "(?i)^AllowGroups\\s+"
+    line: AllowGroups {{ cis_sshd['allowgroups'] }}
+  when: cis_sshd['allowgroups'] is defined and cis_sshd['allowgroups']|trim != "" | default('')
+  notify: restart sshd 
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 
+
+- name: 5.2.14|Ensure SSH access is limited 
+  lineinfile:
+    state: present
+    path: /etc/ssh/sshd_config
+    regexp: "(?i)^DenyUsers\\s+"
+    line: DenyUsers {{ cis_sshd['denyusers'] }}
+  when: cis_sshd['denyusers'] is defined and cis_sshd['denyusers']|trim != "" | default('')
+  notify: restart sshd 
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 
+
+- name: 5.2.14|Ensure SSH access is limited 
+  lineinfile:
+    state: present
+    path: /etc/ssh/sshd_config
+    regexp: "(?i)^(#)?DenyGroups\\s+"
+    line: DenyGroups {{ cis_sshd['denygroups'] }}
+  when: cis_sshd['denygroups'] is defined and cis_sshd['denygroups']|trim != "" | default('')
+  notify: restart sshd 
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 

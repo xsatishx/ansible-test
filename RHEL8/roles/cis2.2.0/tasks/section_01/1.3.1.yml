@@ -1,0 +1,127 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.3.1|task01
+  shell: rpm -q aide
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance
+
+- name: 1.3.1|task02
+  yum:
+    name: aide
+    state: present
+  register: task02
+  when: is_compliance or is_remediate
+
+- name: 1.3.1|Ensure AIDE is installed
+  moveit:
+    section: 1.3.1
+    description: Ensure AIDE is installed
+    info: |
+      <pre class="primary">
+      Run the following command and verify aide is installed:
+      </pre>
+      <pre class="secondary">
+      # rpm -q aide
+      aide-&lt;version&gt;
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      rpm -q aide
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'failed' if task02.changed else 'passed'}}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.3.1|task03
+  stat:
+    path: "{{ cis_aide_database_filename }}"
+  register: task03
+  when: is_remediate
+
+- name: 1.3.1|task04
+  shell: "{{ item }}"
+  args:
+    warn: no
+  with_items:
+    - "aide --init"
+    - "mv {{ cis_aide_src_database_filename }} {{ cis_aide_database_filename }}"
+  when:
+    - is_remediate
+    - not task03.stat.exists
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task04
+
+- name: 1.3.1|Ensure AIDE is installed
+  moveit:
+    section: 1.3.1
+    description: Ensure AIDE is installed
+    info: |
+      <pre class="primary">
+      Run the following command to install aide :
+      </pre>
+      <pre class="secondary">
+      # yum install aide
+      </pre>
+
+      <pre class="primary">
+      Initialize AIDE:
+      </pre>
+      <pre class="secondary">
+      # aide --init
+      # mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+      </pre>
+    cmd_output: |
+      {% if task02.changed %}
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      # yum install aide
+      </pre>
+      {% endif %}
+
+      {% for item task04.results %}
+      {% if item.changed %}
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      {{item.cmd}}
+      </pre>
+      {% endif %}
+      {% endfor %}
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'changed' if task02.changed or task04.changed else 'passed'}}"
+  when: is_remediate
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation

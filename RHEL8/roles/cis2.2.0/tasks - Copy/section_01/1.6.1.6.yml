@@ -1,0 +1,72 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.6.1.6|task01
+  shell: |
+    /usr/bin/ps -eZ | /usr/bin/egrep "initrc" | /usr/bin/egrep -vw "tr|ps|egrep|bash|awk" | /usr/bin/awk -F: '{ print $NF } END {if (NR == 0) print "none"}'
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance
+
+- name: 1.6.1.6|Ensure no unconfined daemons exist
+  moveit:
+    section: 1.6.1.6
+    description: Ensure no unconfined daemons exist
+    info: |
+      <pre class="primary">
+      Run the following command and verify not output is produced:
+      </pre>
+      <pre class="secondary">
+      # ps -eZ | egrep "initrc" | egrep -vw "tr|ps|egrep|bash|awk" | tr ':' ' ' | awk '{ print $NF }'
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      (/usr/bin/ps -eZ | /usr/bin/egrep "initrc" | /usr/bin/egrep -vw "tr|ps|egrep|bash|awk" | /usr/bin/awk -F: '{ print $NF } END {if (NR == 0) print "none"}')
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if 'none' in task01.stdout_lines else 'failed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.6.1.6|Ensure no unconfined daemons exist
+  moveit:
+    section: 1.6.1.6
+    description: Ensure no unconfined daemons exist
+    info: |
+      <pre class="primary">
+      Investigate any unconfined daemons found during the audit action. They may need to have an existing security context assigned to them or a policy built for them.
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      Manual intervention required for partition-related controls.
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "manual"
+  when: is_remediate
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation

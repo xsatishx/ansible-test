@@ -1,0 +1,178 @@
+Task>: Gathering Facts
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : Pre|Check OS version and family
+Status>: FAILED
+Ignored task
+Task>: cis2.2.0 : Pre|Check ansible version
+Status>: SKIPPED
+Ignored task
+Task>: cis2.2.0 : Pre|Check full version
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for autofs service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for rhnsd service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for xinetd service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for ntpd service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for chronyd service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for avahi-daemon service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for cups service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for dhcpd service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for slapd service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for nfs service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for rpcbind service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for rpcbind service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for named service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for vsftpd service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for httpd service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for dovecot service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for smb service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for squid service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for snmpd service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for ypserv service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for rsh.socket service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for rlogin.socket service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for rexec.socket service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for ntalk service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for telnet service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for tftp service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for rsyncd service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Check for gdm service
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Gather accounts with empty password fields
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|Gather UID 0 accounts other than root
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : INIT|List users accounts
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : 1.1.1.1|task01
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : 1.1.1.1|Ensure mounting of cramfs filesystems is disabled
+Status>: OK
+Valid Task
+Current Status: failed
+StatusElse: failed
+**************** END OF TASK *******************
+Task>: cis2.2.0 : 1.1.1.1|task02
+Status>: OK
+Valid Task
+**************** END OF TASK *******************
+Task>: cis2.2.0 : 1.1.1.1|Ensure mounting of cramfs filesystems is disabled
+Status>: OK
+Valid Task
+Current Status: passed
+StatusIF: [u'failed', u'passed']
+**************** END OF TASK *******************
+Task>: cis2.2.0 : 1.1.1.1|task03
+Status>: SKIPPED
+Ignored task
+Task>: cis2.2.0 : 1.1.1.1|task04
+Status>: SKIPPED
+Ignored task
+Task>: cis2.2.0 : 1.1.1.1|Ensure mounting of cramfs filesystems is disabled
+Status>: SKIPPED
+Ignored task
+Task>: cis2.2.0 : 1.1.1.1|task05
+Status>: SKIPPED
+Ignored task
+Task>: cis2.2.0 : 1.1.1.1|Ensure mounting of cramfs filesystems is disabled
+Status>: SKIPPED
+Ignored task
+Generating report....
+Task: 1.1.1.1, Status: passed
+Task: 1.1.1.1, Status: failed
+ip-172-31-95-203_audit
+============= Completed Successfully =============

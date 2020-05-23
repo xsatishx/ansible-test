@@ -1,0 +1,153 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.2.2|task01
+  shell: /usr/bin/grep ^gpgcheck\\s*=\\s*0 /etc/yum.conf | /usr/bin/awk 'END {if (NR == 0) print "passed" ; else print "failed"}'
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance
+
+- name: 1.2.2|task02
+  shell: /usr/bin/grep ^gpgcheck\\s*=\\s*0 /etc/yum.repos.d/* | /usr/bin/awk 'END {if (NR == 0) print "passed" ; else print "failed"}'
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task02
+  when: is_compliance
+
+- name: 1.2.2|Ensure gpgcheck is globally activated
+  moveit:
+    section: 1.2.2
+    description: Ensure gpgcheck is globally activated
+    info: |
+      <pre class="primary">
+      Run the following command and verify gpgcheck is set to '1':
+      </pre>
+      <pre class="secondary">
+      # grep ^gpgcheck /etc/yum.conf
+      gpgcheck=1
+      </pre>
+      <pre class="primary">
+      Run the following command and verify that all instances of gpgcheck returned are set to '1':
+      </pre>
+      <pre class="secondary">
+      # grep ^gpgcheck /etc/yum.repos.d/*
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      grep ^gpgcheck\s*=\s*0 /etc/yum.conf | awk 'END {if (NR == 0) print "passed" ; else print "failed"}'
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout }}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'failed' if task01.stdout == 'failed' else 'passed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+
+- name: 1.2.2|Ensure gpgcheck is globally activated
+  moveit:
+    section: 1.2.2
+    description: Ensure gpgcheck is globally activated
+    info: |
+      <pre class="primary">
+      Run the following command and verify gpgcheck is set to '1':
+      </pre>
+      <pre class="secondary">
+      # grep ^gpgcheck /etc/yum.conf
+      gpgcheck=1
+      </pre>
+      <pre class="primary">
+      Run the following command and verify that all instances of gpgcheck returned are set to '1':
+      </pre>
+      <pre class="secondary">
+      # grep ^gpgcheck /etc/yum.repos.d/*
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      grep ^gpgcheck\s*=\s*0 /etc/yum.repos.d/* | awk 'END {if (NR == 0) print "passed" ; else print "failed"}'
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task02.stdout }}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'failed' if task02.stdout == 'failed' else 'passed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.2.2|task03
+  find:
+    paths: /etc/yum.repos.d
+    pattern: "*.repo"
+  register: task03
+  when: is_remediate
+
+- name: 1.2.2|task04
+  replace:
+    path: "{{ item.path }}"
+    regexp: "^gpgcheck(\\s)*=.*"
+    replace: "gpgcheck=1"
+  with_items:
+    - "{{ task03.files }}"
+    - {path: '/etc/yum.conf'}
+  when: is_remediate
+  register: task04
+
+- name: 1.2.2|Ensure gpgcheck is globally activated
+  moveit:
+    section: 1.2.2
+    description: Ensure gpgcheck is globally activated
+    info: |
+      <pre class="primary">
+      Edit /etc/yum.conf and set 'gpgcheck=1' in the [main] section.
+      Edit any failing files in /etc/yum.repos.d/* and set all instances of gpgcheck to '1'.
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      Following files changed:
+      </pre>
+      <pre class="secondary">
+      {% for result in task04.results %}
+      {% if result.changed %}
+      {{ result.item.path }}
+      {% endif %}
+      {% endfor %}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'changed' if task04.changed else 'passed' }}"
+  when: is_remediate
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation

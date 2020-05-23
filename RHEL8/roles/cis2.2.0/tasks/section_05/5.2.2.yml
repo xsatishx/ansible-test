@@ -1,0 +1,14 @@
+---
+
+- name: 5.2.2|Ensure SSH Protocol is set to 2 
+  lineinfile:
+    state: present
+    path: /etc/ssh/sshd_config
+    regexp: "(?i)^(#)?protocol\\s+"
+    line: 'Protocol 2'
+  notify: restart sshd
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 

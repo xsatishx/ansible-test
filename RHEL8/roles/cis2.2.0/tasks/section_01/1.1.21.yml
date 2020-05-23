@@ -1,0 +1,85 @@
+---
+
+- name: 1.1.21|task01
+  shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d \( -perm -0002 -a ! -perm -1000 \) 2>/dev/null | awk '{print} END {if (NR == 0) print "none"}'
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance or is_remediate
+
+###############
+#    Audit    #
+###############
+
+- name: 1.1.21|Ensure sticky bit is set on all world-writable directories
+  moveit:
+    section: 1.1.21
+    description: Ensure sticky bit is set on all world-writable directories
+    info: |
+      <pre class="primary">
+      Run the following command to verify no world writable directories exist without the sticky bit set::
+      </pre>
+      <pre class="secondary">
+      # df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d \( -perm -0002 -a ! -perm -1000 \) 2>/dev/null
+      &lt;No output&gt;
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d \( -perm -0002 -a ! -perm -1000 \) 2>/dev/null
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout_lines | difference(["none"]) | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if 'none' in task01.stdout_lines else 'failed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.1.21|task02
+  shell: set -o pipefail && df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d -perm -0002 2>/dev/null | xargs chmod a+t
+  changed_when: ('no' if (task02.skipped is defined and task02.skipped) else 'yes')
+  failed_when: no
+  register: task02
+  when:
+    - is_remediate
+    - ('none' not in task01.stdout_lines)
+
+- name: 1.1.21|Ensure sticky bit is set on all world-writable directories
+  moveit:
+    section: 1.1.21
+    description: Ensure sticky bit is set on all world-writable directories
+    info: |
+      <pre class="primary">
+      Run the following command to set the sticky bit on all world writable directories:
+      </pre>
+      <pre class="secondary">
+      # df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d -perm -0002 2>/dev/null | xargs chmod a+t
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      set -o pipefail && df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d -perm -0002 2>/dev/null | xargs chmod a+t
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'changed' if task02.changed else 'passed' }}"
+  when: is_remediate
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation

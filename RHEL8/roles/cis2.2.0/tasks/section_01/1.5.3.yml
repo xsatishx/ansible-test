@@ -1,0 +1,153 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.5.3|task01
+  shell: /usr/sbin/sysctl kernel.randomize_va_space
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance
+
+- name: 1.5.1|task02
+  set_fact:
+    is_valid01: '{{ task01.stdout_lines | select("match", "^\s*kernel\.randomize_va_space\s*=\s*2\s*$") | list | length > 0 }}'
+  when: is_compliance
+
+- name: 1.5.3|Ensure address space layout randomization (ASLR) is enabled
+  moveit:
+    section: 1.5.3
+    description: Ensure address space layout randomization (ASLR) is enabled
+    info: |
+      <pre class="primary">
+      Run the following command and verify output matches:
+      </pre>
+      <pre class="secondary">
+      # sysctl kernel.randomize_va_space
+      kernel.randomize_va_space = 2
+      # grep "kernel\.randomize_va_space" /etc/sysctl.conf /etc/sysctl.d/*
+      kernel.randomize_va_space = 2
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      /usr/sbin/sysctl kernel.randomize_va_space
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if is_valid01 else 'failed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+
+- name: 1.5.3|task03
+  shell: /usr/bin/egrep -s "^\s*kernel\.randomize_va_space" /etc/sysctl.conf /etc/sysctl.d/*
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task03
+  when: is_compliance
+
+- name: 1.5.1|task04
+  set_fact:
+    is_valid02: '{{ task03.stdout_lines | select("match", "^.*:\s*kernel\.randomize_va_space\s*=\s*2\s*$") | list | length > 0 }}'
+  when: is_compliance
+
+- name: 1.5.3|Ensure address space layout randomization (ASLR) is enabled
+  moveit:
+    section: 1.5.3
+    description: Ensure address space layout randomization (ASLR) is enabled
+    info: |
+      <pre class="primary">
+      Run the following command and verify output matches:
+      </pre>
+      <pre class="secondary">
+      # sysctl kernel.randomize_va_space
+      kernel.randomize_va_space = 2
+      # grep "kernel\.randomize_va_space" /etc/sysctl.conf /etc/sysctl.d/*
+      kernel.randomize_va_space = 2
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      grep "kernel\.randomize_va_space" /etc/sysctl.conf /etc/sysctl.d/*
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task03.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if is_valid02 else 'failed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.5.3|task05
+  sysctl:
+    name: kernel.randomize_va_space
+    value: '2'
+    state: present
+    reload: yes
+    sysctl_set: yes
+    ignoreerrors: yes
+  register: task05
+  when: is_remediate
+
+- name: 1.5.3|Ensure address space layout randomization (ASLR) is enabled
+  moveit:
+    section: 1.5.3
+    description: Ensure address space layout randomization (ASLR) is enabled
+    info: |
+      <pre class="primary">
+      Set the following parameter in /etc/sysctl.conf or a /etc/sysctl.d/* file:
+      </pre>
+      <pre class="secondary">
+      kernel.randomize_va_space = 2
+      </pre>
+      <pre class="primary">
+      Run the following command to set the active kernel parameter:
+      </pre>
+      <pre class="secondary">
+      # sysctl -w kernel.randomize_va_space=2
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      Following line added to /etc/sysctl.conf
+      </pre>
+      <pre class="secondary">
+      kernel.randomize_va_space = 2
+      Kernel parameter is reloaded
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'changed' if task05.changed else 'passed' }}"
+  when: is_remediate
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation

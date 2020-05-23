@@ -1,0 +1,36 @@
+---
+
+- name: 6.1.13|Audit SUID executables 
+  shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -4000
+  register: task_6_1_13
+  check_mode: no
+  changed_when: no
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 
+
+- name: 6.1.13|Audit SUID executables 
+  fail:
+    msg: "{{ task_6_1_13.stdout_lines  | join('\n') }}"
+  when:
+    - task_6_1_13.stdout_lines is defined and task_6_1_13.stdout_lines|length > 0
+    - fail_on_manual_remediation_actions
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 
+
+- name: 6.1.13|Audit SUID executables 
+  debug:
+    msg: "{{ task_6_1_13.stdout  | join('\n') }}"
+  when:
+    - task_6_1_13.stdout_lines is defined and task_6_1_13.stdout_lines|length > 0
+    - not fail_on_manual_remediation_actions
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE

@@ -1,0 +1,75 @@
+---
+
+- name: 1.1.7|task01
+  set_fact:
+    var_tmp_exist: "{{ '/var/tmp' in  mountpoints }}"
+  when: is_compliance or is_remediate
+
+###############
+#    Audit    #
+###############
+
+- name: 1.1.7|task02
+  shell: /usr/bin/mount | /usr/bin/grep 'on /var/tmp ' | /usr/bin/awk '{print} END {if (NR == 0) print "failed"}'
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task02
+  when: is_compliance
+
+- name: 1.1.7|Ensure separate partition exists for /var/tmp
+  moveit:
+    section: 1.1.7
+    description: Ensure separate partition exists for /var/tmp
+    info: |
+      <pre class="primary">
+      Run the following command and verify output shows /var/tmp is mounted:
+      </pre>
+      <pre class="secondary">
+      # mount | grep /var/tmp
+      &lt;device&gt; on /var/tmp type ext4 (rw,nosuid,nodev,noexec,relatime)
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      mount | grep 'on /var/tmp '
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task02.stdout_lines | difference(["failed"]) | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if var_tmp_exist else 'failed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.1.7|Ensure separate partition exists for /var/tmp
+  moveit:
+    section: 1.1.7
+    description: Ensure separate partition exists for /var/tmp
+    info: |
+      <pre class="primary">
+      For new installations, during installation create a custom partition setup and specify a separate partition for /var/tmp.
+      For systems that were previously installed, create a new partition and configure /etc/fstab as appropriate.
+      </pre>
+    cmd_output: <pre class="primary">Manual intervention required for partition-related controls.</pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if var_tmp_exist else 'manual' }}"
+  when: is_remediate
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation

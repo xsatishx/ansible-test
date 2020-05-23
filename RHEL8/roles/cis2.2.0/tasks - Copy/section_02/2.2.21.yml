@@ -1,0 +1,13 @@
+---
+
+- name: 2.2.21|Ensure rsync service is not enabled 
+  service:
+    name: rsyncd
+    state: stopped
+    enabled: no     
+  when: rsyncd_service_status.stdout == "loaded"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE    

@@ -1,0 +1,29 @@
+---
+
+- name: 4.2.3|Ensure rsyslog or syslog-ng is installed 
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  when: cis_enable_rsyslog
+  with_items:
+    - { name: "rsyslog", state: "present" }
+    - { name: "syslog-ng", state: "absent" }
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE   
+
+- name: 4.2.3|Ensure rsyslog or syslog-ng is installed 
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  when: cis_enable_syslog_ng
+  with_items:
+    - { name: "rsyslog", state: "absent" }
+    - { name: "syslog-ng", state: "present" }
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 

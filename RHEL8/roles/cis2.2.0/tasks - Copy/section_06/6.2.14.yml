@@ -1,0 +1,49 @@
+---
+
+- name: 6.2.14|Ensure no users have .rhosts files
+  file:
+    state: absent
+    dest: "~{{ item }}/.rhosts"
+  when: item not in cis_skip_user_dir
+  with_items: "{{ users.stdout_lines }}"
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE  
+
+
+# - name: 6.2.14|Ensure no users have .rhosts files
+#   script: audit_6.2.14.sh
+#   check_mode: no
+#   changed_when: False
+#   register: audit_6_2_14
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE 
+
+# - name: 6.2.14|Ensure no users have .rhosts files
+#   fail:
+#     msg: "{{ audit_6_2_14.stdout_lines }}"
+#   when:
+#     - audit_6_2_14.stdout_lines is defined and audit_6_2_14.stdout_lines|length > 0
+#     - fail_on_manual_remediation_actions
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE 
+
+# - name: 6.2.14|Ensure no users have .rhosts files
+#   debug:
+#     msg: "{{ audit_6_2_14.stdout_lines }}"
+#   when:
+#     - audit_6_2_14.stdout_lines is defined and audit_6_2_14.stdout_lines|length > 0
+#     - not fail_on_manual_remediation_actions
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE 

@@ -1,0 +1,20 @@
+---
+ 
+- name: 4.3|Ensure logrotate is configured 
+  find:
+    paths: /etc/logrotate.d/
+  register: task_4_3
+
+- name: 4.3|Ensure logrotate is configured 
+  replace:
+    path: "{{ item.path }}"
+    regexp: '^(\s*)(daily|weekly|monthly|yearly)$'
+    replace: "\\1{{ cis_logrotate }}"
+  with_items:
+      - "{{ task_4_3.files }}"
+      - { path: "/etc/logrotate.conf" }
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 

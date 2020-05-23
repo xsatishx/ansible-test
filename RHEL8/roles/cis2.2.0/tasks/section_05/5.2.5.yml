@@ -1,0 +1,14 @@
+---
+
+- name: 5.2.5|Ensure SSH MaxAuthTries is set to 4 or less 
+  lineinfile:
+    state: present
+    path: /etc/ssh/sshd_config
+    regexp: "(?i)^(#)?MaxAuthTries\\s+"
+    line: 'MaxAuthTries {{ cis_sshd_max_auth_tries }}'
+  notify: restart sshd 
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 

@@ -1,0 +1,18 @@
+---
+
+- name: 3.3.2|Ensure IPv6 redirects are not accepted 
+  sysctl:
+      name: '{{ item.name }}'
+      value: '{{ item.value }}'
+      sysctl_set: yes
+      state: present
+      reload: yes
+  with_items:
+      - { name: net.ipv6.conf.all.accept_redirects, value: 0 }
+      - { name: net.ipv6.conf.default.accept_redirects, value: 0 }
+  notify: sysctl flush ipv6 route table
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE  

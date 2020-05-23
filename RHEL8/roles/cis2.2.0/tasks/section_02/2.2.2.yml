@@ -1,0 +1,10 @@
+---
+
+- name: 2.2.2|Ensure X Window System is not installed
+  yum:
+    name: "xorg-x11*"
+    state: absent
+  tags:
+    - scored
+    - Level1_Server
+    - RULE

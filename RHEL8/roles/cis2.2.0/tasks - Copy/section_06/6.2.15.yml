@@ -1,0 +1,42 @@
+---
+
+- name: 6.2.15|Ensure all groups in /etc/passwd exist in /etc/group
+  script: audit_6.2.15.sh
+  args: 
+    executable: bash -l
+  check_mode: no
+  changed_when: 
+    - audit_6_2_15.stdout_lines is defined 
+    - audit_6_2_15.stdout_lines|length > 1
+  register: audit_6_2_15
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 
+
+- name: 6.2.15|Ensure all groups in /etc/passwd exist in /etc/group
+  fail:
+    msg: "{{ audit_6_2_15.stdout_lines | join('\n')}}"
+  when:
+    - audit_6_2_15.stdout_lines is defined 
+    - audit_6_2_15.stdout_lines|length > 1
+    - fail_on_manual_remediation_actions
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 
+
+- name: 6.2.15|Ensure all groups in /etc/passwd exist in /etc/group
+  debug:
+    msg: "{{ audit_6_2_15.stdout_lines | join('\n')}}"
+  when:
+    - audit_6_2_15.stdout_lines is defined 
+    - audit_6_2_15.stdout_lines|length > 1
+    - not fail_on_manual_remediation_actions
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE     

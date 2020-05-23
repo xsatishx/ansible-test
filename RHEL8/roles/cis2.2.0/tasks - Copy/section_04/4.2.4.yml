@@ -1,0 +1,24 @@
+---
+
+- name: 4.2.4|Ensure permissions on all logfiles are configured 
+  shell: find /var/log -type f
+  register: task_4_2_4
+  changed_when: false
+  check_mode: no
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 
+
+- name: 4.2.4|Ensure permissions on all logfiles are configured 
+  file:
+    path: "{{ item }}"
+    mode: g-wx,o-rwx
+  with_items:
+    - "{{ task_4_2_4.stdout_lines }}"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE  

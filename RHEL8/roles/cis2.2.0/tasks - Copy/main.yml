@@ -1,0 +1,47 @@
+---
+# Tasks file for RHEL7-CIS Benchmark
+
+- include: precheck.yml
+  tags:
+   - always
+
+- include: init.yml
+  become: yes
+  tags:
+    - always
+
+- include: section_01/section_01.yml
+  become: yes
+  tags:
+    - 1|Initial Setup
+    - section01
+
+- include: section_02/section_02.yml
+  become: yes
+  tags: 
+    - 2|Services  
+    - section02
+        
+- include: section_03/section_03.yml
+  become: yes
+  tags: 
+    - 3|Network Configuration
+    - section03
+
+- include: section_04/section_04.yml
+  become: yes
+  tags: 
+    - 4|Logging and Auditing
+    - section04
+
+- include: section_05/section_05.yml
+  become: yes
+  tags: 
+    - 5|Access, Authentication and Authorization
+    - section05
+
+- include: section_06/section_06.yml
+  become: yes
+  tags: 
+    - 6|System Maintenance
+    - section06

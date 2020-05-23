@@ -1,0 +1,11 @@
+---
+
+- name: 2.3.2|Ensure rsh client is not installed 
+  yum:
+    name: rsh
+    state: absent
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE

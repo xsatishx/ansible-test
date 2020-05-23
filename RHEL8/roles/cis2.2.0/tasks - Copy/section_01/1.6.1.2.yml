@@ -1,0 +1,182 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.6.1.2|task01
+  shell: /usr/bin/grep "^SELINUX=" /etc/selinux/config
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance
+
+- name: 1.6.1.2|task02
+  set_fact:
+    is_valid01: '{{ task01.stdout is regex("^SELINUX\s*=\s*enforcing") }}'
+  when: is_compliance
+
+- name: 1.6.1.2|Ensure the SELinux state is enforcing
+  moveit:
+    section: 1.6.1.2
+    description: Ensure the SELinux state is enforcing
+    info: |
+      <pre class="primary">
+      Run the following commands and ensure output matches:
+      </pre>
+      <pre class="secondary">
+      # grep SELINUX=enforcing /etc/selinux/config
+      SELINUX=enforcing
+
+      # sestatus
+      SELinux status: enabled
+      Current mode: enforcing
+      Mode from config file: enforcing
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      grep "^SELINUX=" /etc/selinux/config
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if is_valid01 else 'failed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation
+
+- name: 1.6.1.2|task03
+  shell: sestatus | /usr/bin/egrep "SELinux status:"
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task03
+  when: is_compliance
+
+- name: 1.6.1.2|task04
+  set_fact:
+    is_valid02: '{{ task03.stdout_lines is regex("SELinux status:\s*enabled") }}'
+  when: is_compliance
+
+- name: 1.6.1.2|task05
+  shell: sestatus | /usr/bin/egrep "Current mode:"
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task05
+  when: is_compliance
+
+- name: 1.6.1.2|task06
+  set_fact:
+    is_valid03: '{{ task05.stdout_lines is regex("Current mode:\s*enforcing") }}'
+  when: is_compliance
+
+- name: 1.6.1.2|task07
+  shell: sestatus | /usr/bin/egrep "Mode from config file:"
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task07
+  when: is_compliance
+
+- name: 1.6.1.2|task08
+  set_fact:
+    is_valid04: '{{ task07.stdout_lines is regex("Mode from config file:\s*enforcing") }}'
+  when: is_compliance
+
+
+- name: 1.6.1.2|Ensure the SELinux state is enforcing
+  moveit:
+    section: 1.6.1.2
+    description: Ensure the SELinux state is enforcing
+    info: |
+      <pre class="primary">
+      Run the following commands and ensure output matches:
+      </pre>
+      <pre class="secondary">
+      # grep SELINUX=enforcing /etc/selinux/config
+      SELINUX=enforcing
+
+      # sestatus
+      SELinux status: enabled
+      Current mode: enforcing
+      Mode from config file: enforcing
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      sestatus | /usr/bin/egrep "SELinux status:|Current mode:|Mode from config file:"
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task03.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      {{ task05.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      {{ task07.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if is_valid02 and is_valid03 and is_valid04 else 'failed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.6.1.2|task05
+  selinux:
+    configfile: /etc/selinux/config
+    policy: "{{ cis_selinux_pol }}"
+    state: enforcing
+  when: is_remediate
+  register: task05
+
+- name: 1.6.1.2|Ensure the SELinux state is enforcing
+  moveit:
+    section: 1.6.1.2
+    description: Ensure the SELinux state is enforcing
+    info: |
+      <pre class="primary">
+      Edit the /etc/selinux/config file to set the SELINUX parameter:
+      </pre>
+      <pre class="secondary">
+      SELINUX=enforcing
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      SELINUX parameter in the /etc/selinux/config file is set to:
+      </pre>
+      <pre class="secondary">
+      SELINUX=enforcing is changed in /etc/selinux/config file
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'changed' if task05.changed else 'passed' }}"
+  when: is_remediate
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation

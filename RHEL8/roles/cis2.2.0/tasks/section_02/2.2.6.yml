@@ -1,0 +1,13 @@
+---
+
+- name: 2.2.6|Ensure LDAP server is not enabled 
+  service:
+    name: slapd
+    state: stopped
+    enabled: no  
+  when: slapd_service_status.stdout == "loaded"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE

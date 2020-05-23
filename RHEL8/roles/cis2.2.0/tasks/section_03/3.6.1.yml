@@ -1,0 +1,50 @@
+---
+
+# firewalld
+- name: 3.6.1|Ensure iptables/ firewalld is installed 
+  yum:
+    name: firewalld
+    state: present
+  when: cis_firewall == "firewalld"
+  notify: restart firewalld
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 
+
+- name: 3.6.1|Ensure iptables/ firewalld is installed 
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+  when: cis_firewall == "firewalld"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 
+
+# iptables
+- name: 3.6.1|Ensure iptables/ firewalld is installed 
+  yum:
+    name: iptables
+    state: present
+  when: cis_firewall == "iptables"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE
+
+- name: 3.6.1|Ensure iptables/ firewalld is installed 
+  service:
+    name: iptables
+    state: started
+    enabled: yes
+  when:  cis_firewall == "iptables"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE   

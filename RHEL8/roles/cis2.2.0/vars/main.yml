@@ -1,0 +1,197 @@
+---
+
+linux: 
+  - RedHat
+  - centos
+windows:
+  - windows2012
+
+is_compliance: "{{not is_remediate}}"
+
+# 1.1.1.1, 1.1.1.2, 1.1.1.3, 1.1.1.4, 1.1.1.5, 1.1.1.6, 1.1.1.7, 1.1.1.8
+cis_modprobe_conf_filename: /etc/modprobe.d/CIS.conf
+cis_modprobe_vfat_filename: /etc/modprobe.d/vfat.conf
+cis_modprobe_squashfs_filename: /etc/modeprobe.d/squashfs.conf
+cis_modprobe_udf_filename: /etc/modeprobe.d/udf.conf
+
+# 1.1.2, 1.1.6, 1.1.7, 1.1.11, 1.1.12, 1.1.13, 1.1.23
+mountpoints: "{{ ansible_mounts | selectattr('mount')| map(attribute='mount')  | list }}"
+cis_modprobe_usb_filename: /etc/modprobe.d/usb-storage.conf
+
+#/tmp
+tmp_mountpoints: "{{ ansible_mounts | selectattr('mount', 'equalto', '/tmp') | list }}"
+tmp_mountpoint_options: "{{ tmp_mountpoints | map(attribute='options') | join(',')}}"
+tmp_partition_opt: []
+
+#/var
+var_mountpoints: "{{ ansible_mounts | selectattr('mount', 'equalto', '/var') | list }}"
+var_mountpoint_options: "{{ var_mountpoints | map(attribute='options') | join(',')}}"
+var_partition_opt: []
+
+#/var/tmp
+var_tmp_mountpoints: "{{ ansible_mounts | selectattr('mount', 'equalto', '/var/tmp') | list }}"
+var_tmp_mountpoint_options: "{{ var_tmp_mountpoints | map(attribute='options') | join(',')}}"
+var_tmp_partition_opt: []
+
+#/home
+home_mountpoints: "{{ ansible_mounts | selectattr('mount', 'equalto', '/home') | list }}"
+home_mountpoint_options: "{{ home_mountpoints | map(attribute='options') | join(',')}}"
+home_partition_opt: []   
+
+#/dev/shm
+dev_shm_mountpoints: "{{ ansible_mounts | selectattr('mount', 'equalto', '/dev/shm') | list }}"
+dev_shm_mountpoint_options: "{{ dev_shm_mountpoints | map(attribute='options') | join(',')}}"
+dev_shm_partition_opt: []  
+
+# 1.3.1
+cis_aide_database_filename: "/var/lib/aide/aide.db.gz"
+cis_aide_src_database_filename: "/var/lib/aide/aide.db.new.gz"
+
+# 1.3.2
+cis_aide_cron:
+  user: "root"
+  job: "/usr/sbin/aide --check"
+  minute: 0
+  hour: 5
+  dow: "*" # Day of week
+  dom: "*" # Day of month
+  month: "*"
+  file: "/etc/crontab"
+
+# 1.4.1
+cis_grub_bootloader_filename: "/boot/grub2/grub.cfg"
+cis_user_bootloader_filename: "/boot/grub2/user.cfg"
+
+# 1.4.2 Bootloader password
+rhel7cis_bootloader_password: random
+
+# 1.5.1
+# cis_security_limits_filename: "/etc/security/limits.conf"
+
+# 1.6.1.2
+cis_selinux_pol: targeted
+
+# 1.7.1.1
+cis_remote_login_warning_banner: "Authorized uses only. All activity may be monitored and reported.\n"
+cis_warning_banner: "Authorized uses only. All activity may be monitored and reported."
+COMPANY: "HPE"
+
+# 1.2.1.1
+cis_time_synchronization: chrony
+cis_time_synchronization_service: chronyd
+
+cis_chrony_servers: |+
+ server 0.pool.ntp.org
+ server 1.pool.ntp.org
+ server 2.pool.ntp.org
+ server 3.pool.ntp.org
+
+cis_host_allow:
+    - "10.0.0.0/255.0.0.0"
+    - "172.16.0.0/255.240.0.0"
+    - "192.168.0.0/255.255.0.0"
+
+cis_firewall: firewalld
+# cis_firewall: iptables
+
+cis_firewall_services:
+    - ssh
+    - dhcpv6-client
+
+cis_firewall_rules_for_open_connection: 
+  - {protocol: tcp, destination_port: 22, comment: 'Accept new SSH connections.'}    
+
+
+## Section4 vars
+# in MB
+max_log_file_size: 10
+
+rhel7cis_sudolog: /var/log/sudo.log
+
+# 4.2.1.4, 4.2.2.4
+cis_rsyslog_remote_loghost_address: "loghost.example.com" # Can be a hostname or IP address. If no forwarding should occur, exclude this check.
+
+# 4.2.1.5
+cis_rsyslog_accept_remote_messages: false # Set to true if the host should accept remote syslog messages.
+cis_syslogng_accept_remote_messages: false # Set to true if the host should accept remote syslog messages.
+
+cis_logrotate: "daily"
+
+# 4.2.3
+# You should only enable either rsyslog or syslog-ng, but not both.
+cis_enable_rsyslog: true # Set to true if rsyslog should be enabled/configured.
+cis_enable_syslog_ng: false # Set to true if syslog_ng should be enabled/configured.
+
+
+# 5.2.5
+cis_sshd_max_auth_tries: 4
+
+# 5.2.11, not in use now
+cis_sshd:
+    clientalivecountmax: 0
+    clientaliveinterval: 300
+    ciphers: "aes256-ctr,aes192-ctr,aes128-ctr"
+    macs: "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com"    
+    logingracetime: 60
+    # - make sure you understand the precedence when working with these values!!
+    allowusers: ""
+    allowgroups: ""
+    denyusers: ""
+    denygroups: ""
+
+# 5.3.1
+cis_pwquality_minlen: "14" # Minimum number of characters required for passwords
+cis_pwquality_dcredit: "-1" # At least one digit must be provided
+cis_pwquality_ucredit: "-1" # At least one uppercase character must be provided
+cis_pwquality_ocredit: "-1" # At least one special character must be provided
+cis_pwquality_lcredit: "-1" # At least one lowercase character must be provided
+
+
+cis_lockout:
+  pwfailed_attempts: 5
+  pwunlock_time: 900
+  pwretry_number: 3 # Number of times a password can be attempted before sending back a failure
+  pwreuse_number: 5 # Ensure password reuse is limited to this number
+  passwd_hash: "sha512" 
+
+
+cis_pass:
+  max_days: 90
+  min_days: 7
+  warn_age: 7
+  inactive_lock: 30
+
+cis_rule_5_4_2_min_uid: 1000
+
+# 5.4.2
+rhel7cis_skip_lock_users:
+  - root
+  - halt
+  - shutdown
+  - sync
+
+# 5.4.4
+cis_umask_default: "027"
+cis_umask_shell_files:
+- /etc/bashrc
+- /etc/profile    
+
+# 5.5
+cis_wheel_group_members: 
+  - root
+
+cis_auth_root_ttys: [console, tty1, tty2, tty3, tty4, tty5, tty6]
+
+# Whether to fail when remediation items are found for recommendations which can't be automatically fixed.
+# If false, a debug message will be generated instead, with the preface *** ACTION REQUIRED ***..
+fail_on_manual_remediation_actions: true  # True or false.
+
+# 6.2.11
+cis_skip_user_dir:
+  - root
+  - halt
+  - sync
+  - shutdown
+
+cis_ignore_user: admin
+  

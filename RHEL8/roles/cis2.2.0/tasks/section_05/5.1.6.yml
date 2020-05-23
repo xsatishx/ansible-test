@@ -1,0 +1,14 @@
+---
+
+- name: 5.1.6|Ensure permissions on /etc/cron.monthly are configured 
+  file:
+    dest: /etc/cron.monthly
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE   

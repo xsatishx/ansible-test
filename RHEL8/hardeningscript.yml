@@ -1,0 +1,12 @@
+---
+
+- name: ================= RHEL7 Hardening Script =================
+  hosts: RHEL
+  become: true
+  ignore_errors: True
+  gather_facts: true
+
+  roles:
+    - cis2.2.0
+    
+    

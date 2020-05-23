@@ -1,0 +1,31 @@
+---
+
+- name: 5.3.3|Ensure password reuse is limited 
+  pamd:
+    name: system-auth
+    type: password
+    control: sufficient
+    module_path: pam_unix.so
+    new_control: sufficient
+    module_arguments: 'remember=5'
+    state: updated
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE   
+
+- name: 5.3.3|Ensure password reuse is limited 
+  pamd:
+    name: password-auth
+    type: password
+    control: sufficient
+    module_path: pam_unix.so
+    new_control: sufficient
+    module_arguments: 'remember=5'
+    state: updated
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE  

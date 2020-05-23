@@ -1,0 +1,36 @@
+---
+
+- name: 6.1.10|Ensure no world writable files exist
+  shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -0002
+  register: task_6_1_10
+  check_mode: no
+  changed_when: no
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 
+
+- name: 6.1.10|Ensure no world writable files exist
+  fail:
+    msg: "{{ task_6_1_10.stdout_lines }}"
+  when:
+    - task_6_1_10.stdout_lines is defined and task_6_1_10.stdout_lines|length > 0
+    - fail_on_manual_remediation_actions
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 
+
+- name: 6.1.10|Ensure no world writable files exist
+  debug:
+    msg: "{{ task_6_1_10.stdout }}"
+  when:
+    - task_6_1_10.stdout_lines is defined and task_6_1_10.stdout_lines|length > 0
+    - not fail_on_manual_remediation_actions
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE

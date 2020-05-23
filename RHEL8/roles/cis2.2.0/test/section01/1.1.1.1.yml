@@ -1,0 +1,108 @@
+---
+
+- name: 1.1.1.1|Ensure mounting of cramfs filesystems is disabled
+  debug:
+    msg: |
+      'Run the following commands and verify the output is as indicated:\n'
+      '# modprobe -n -v cramfs\n'
+      'install /bin/true\n'
+      '# lsmod | grep cramfs\n'
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation    
+    - AUDIT
+    - INFO
+
+- name: 1.1.1.1|Ensure mounting of cramfs filesystems is disabled
+  shell: /sbin/modprobe -n -v cramfs 2> /dev/null | egrep 'install /bin/true' | /usr/bin/awk '{print} END {if (NR == 0) print "fail"}'
+  check_mode: no
+  failed_when: "'fail' in audit_1"
+  changed_when: no
+  register: audit_1
+
+- name: set fact
+  set_fact:
+    status_task_1: "{{'install /bin/true' in audit_1.stdout_lines|trim }}"
+
+- name: 1.1.1.1|Ensure mounting of cramfs filesystems is disabled
+  debug:
+    msg: |
+      {% if status_task_1 %}Pass
+      {% else %}Fail
+      {% endif %}
+
+- name: 1.1.1.1|Ensure mounting of cramfs filesystems is disabled
+  debug:
+    msg: 
+      - "Command executed:"
+      - "(/usr/sbin/modprobe -n -v cramfs | /usr/bin/awk '{print} END {if (NR == 0) print \"fail\"}')"
+      - "\n"
+      - "Output:"
+      - "{{ audit_1.stdout_lines | join('\n')}}"
+  changed_when: 
+  tags:
+    - AUDIT
+    - OUTPUT
+
+- name: "1.1.1.1"
+  status:
+    policy_number: 1.1.1.1
+    description: Ensure mounting of cramfs filesystems is disabled
+    audit_info: |
+          'Run the following commands and verify the output is as indicated:\n'
+          '# modprobe -n -v cramfs\n'
+          'install /bin/true\n'
+          '# lsmod | grep cramfs\n'
+    audit_output: |
+          "Command executed:"
+          "(/usr/sbin/modprobe -n -v cramfs | /usr/bin/awk '{print} END {if (NR == 0) print \"fail\"}')"
+          "\n"
+          "Output:"
+          "{{ audit_1.stdout_lines | join('\n')}}"   
+    state:  "{{ pass if (status_task_1) else fail }}"
+  register: hello
+
+- name: print
+  debug:
+    var: hello
+
+# - name: 1.1.1.1|Ensure mounting of cramfs filesystems is disabled
+#   shell: lsmod | grep cramfs
+#   check_mode: no
+#   failed_when: no
+#   changed_when: no
+#   register: audit_2
+#   tags:
+#     - scored
+#     - Level1_Server
+#     - Level1_Workstation
+#     - RULE
+#     - AUDIT
+
+# - name: print audit_2
+#   debug:
+#     var: audit_2  
+    
+# - name: 1.1.1.1|Ensure mounting of cramfs filesystems is disabled
+#   lineinfile:
+#     path: "{{ cis_modprobe_conf_filename }}"
+#     regexp: "^(#)?install cramfs(\\s|$)"
+#     line: "install cramfs /bin/true"
+#     state: present
+#     create: yes
+#   tags:
+#     - scored
+#     - Level1_Server
+#     - Level1_Workstation
+#     - RULE
+
+# - name: 1.1.1.1|Ensure mounting of cramfs filesystems is disabled
+#   modprobe:
+#     name: cramfs
+#     state: absent
+#   tags:
+#     - scored
+#     - Level1_Server
+#     - Level1_Workstation
+#     - RULE

@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"ansible.fileCopyConfig": [
+			{
+				"server": "172.23.24.40",
+				"sourcePath": "c:\\dev\\automation\\automationtool\\Linux\\RHEL7/",
+				"targetPath": "automationtool/Linux/RHEL7/",
+				"copyOnSave": true
+			}
+		]
+	}
+}

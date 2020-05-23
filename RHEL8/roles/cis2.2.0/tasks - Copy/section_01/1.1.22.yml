@@ -1,0 +1,94 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.1.22|task01
+  shell: /usr/bin/systemctl is-enabled autofs 2> /dev/null | /usr/bin/awk '{print} END {if(NR==0) print "disabled" }'
+  register: task01
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  when: is_compliance or is_remediate
+
+- name: 1.1.22|Disable Automounting
+  moveit:
+    section: 1.1.22
+    description: Disable Automounting
+    info: |
+      <pre class="primary">
+      Run the following command and verify result is not "enabled":
+      </pre>
+      <pre class="secondary">
+      # systemctl is-enabled autofs
+      disabled
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      systemctl is-enabled autofs 2> /dev/null | awk '{print} END {if(NR==0) print "disabled" }'
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout }}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if task01.stdout == 'disabled' else 'failed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level1_Server
+    - Level2_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.1.22|task02
+  service:
+    name: autofs
+    enabled: no
+    state: stopped
+  register: task02
+  when:
+    - task01.stdout == "enabled"
+    - is_remediate
+
+- name: 1.1.22|Disable Automounting
+  moveit:
+    section: 1.1.22
+    description: Disable Automounting
+    info: |
+      <pre class="primary">
+      Run the following command to disable autofs :
+      </pre>
+      <pre class="secondary">
+      # systemctl disable autofs
+      disabled
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      systemctl disable autofs
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task02.state }}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'changed' if task02.changed else 'passed' }}"
+  when: is_remediate
+  register: test2
+  tags:
+    - scored
+    - Level1_Server
+    - Level2_Workstation

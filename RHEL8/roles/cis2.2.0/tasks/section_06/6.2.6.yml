@@ -1,0 +1,111 @@
+---
+
+- name: 6.2.6|Ensure root PATH Integrity 
+  script: audit_6.2.6.sh
+  args: 
+    executable: bash -l
+  check_mode: no
+  changed_when: 
+    - audit_6_2_6.stdout_lines is defined 
+    - audit_6_2_6.stdout_lines|length > 1
+  register: audit_6_2_6
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 
+
+- name: 6.2.6|Ensure root PATH Integrity 
+  fail:
+    msg: "{{ audit_6_2_6.stdout_lines | join('\n')}}"
+  when:
+    - audit_6_2_6.stdout_lines is defined 
+    - audit_6_2_6.stdout_lines|length > 1
+    - fail_on_manual_remediation_actions
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 
+
+- name: 6.2.6|Ensure root PATH Integrity 
+  debug:
+    msg: "{{ audit_6_2_6.stdout_lines | join('\n')}}"
+  when:
+    - audit_6_2_6.stdout_lines is defined 
+    - audit_6_2_6.stdout_lines|length > 1
+    - not fail_on_manual_remediation_actions
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 
+
+# - name: 6.2.6|Ensure root PATH Integrity 
+#   copy:
+#     src: audit_6.2.6.sh
+#     dest: /tmp/audit_6.2.6.sh
+#     mode: 0700
+#   changed_when: False
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE  
+#     - RUN
+
+# - name: 6.2.6|Ensure root PATH Integrity 
+#   shell: bash -l /tmp/audit_6.2.6.sh
+#   check_mode: no
+#   changed_when: no
+#   register: audit_6_2_6
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE  
+#     - RUN   
+
+# - name: print
+#   debug: 
+#     var: audit_6_2_6
+#   tags:
+#     - RUN    
+
+# - name: 6.2.6|Ensure root PATH Integrity 
+#   fail:
+#     msg: "{{ audit_6_2_6.stdout_lines }}"
+#   when:
+#     - audit_6_2_6.stdout_lines is defined and audit_6_2_6.stdout_lines|length > 0
+#     - fail_on_manual_remediation_actions
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE  
+#     - RUN 
+
+# - name: 6.2.6|Ensure root PATH Integrity 
+#   debug:
+#     msg: "{{ audit_6_2_6.stdout_lines }}"
+#   when:
+#     - audit_6_2_6.stdout_lines is defined and audit_6_2_6.stdout_lines|length > 0
+#     - not fail_on_manual_remediation_actions
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE  
+#     - RUN 
+
+# - name: 6.2.6|Ensure root PATH Integrity 
+#   file:
+#     path: /tmp/audit_6.2.6.sh
+#     state: absent
+#   changed_when: False
+#   tags:
+#     - scored
+#     - Level_Server
+#     - Level_Workstation
+#     - RULE  
+#     - RUN 

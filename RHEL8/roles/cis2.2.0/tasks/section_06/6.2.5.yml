@@ -1,0 +1,31 @@
+---
+
+- name: 6.2.5|Ensure root is the only UID 0 account 
+  shell: passwd -l {{ item }}
+  changed_when: no
+  failed_when: no
+  check_mode: no  
+  with_items: "{{ uid_zero_accounts_except_root.stdout_lines }}"
+  when: 
+    - uid_zero_accounts_except_root.stdout_lines is defined
+    - uid_zero_accounts_except_root.stdout_lines|length > 0  
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE    
+
+- name: 6.2.5|Ensure root is the only UID 0 account 
+  debug:
+    msg: "Following user accounts are locked: {{ uid_zero_accounts_except_root.stdout_lines | join('\n') }}"
+  changed_when: yes
+  when: 
+    - uid_zero_accounts_except_root.stdout_lines is defined
+    - uid_zero_accounts_except_root.stdout_lines|length > 0
+
+- name: 6.2.5|Ensure root is the only UID 0 account 
+  debug:
+    msg: "OK"
+  when:
+    - uid_zero_accounts_except_root.stdout_lines is defined
+    - uid_zero_accounts_except_root.stdout_lines|length == 0   

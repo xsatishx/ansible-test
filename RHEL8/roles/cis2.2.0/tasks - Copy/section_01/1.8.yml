@@ -1,0 +1,75 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.8|task01
+  yum:
+    name: "*"
+    state: latest
+    security: yes
+  register: task01
+  when: is_compliance or is_remediate
+
+- name: 1.8|Ensure updates, patches, and additional security software are installed
+  moveit:
+    section: "1.8"
+    description: Ensure updates, patches, and additional security software are installed
+    info: |
+      <pre class="primary">
+      Run the following command and verify there are no updates or patches to install:
+      </pre>
+      <pre class="secondary">
+      # yum check-update --security
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      # yum check-update --security
+      {% if task01.changed %}
+      Security updates available
+      {% else %}
+      No security updates available
+      {% endif %}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'failed' if (task01.changed) else 'passed'}}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.8|Ensure updates, patches, and additional security software are installed
+  moveit:
+    section: 1.8
+    description: Ensure updates, patches, and additional security software are installed
+    info: |
+      <pre class="primary">
+      Use your package manager to update all packages on the system according to site policy.
+      The following command will install all available security updates:
+      </pre>
+      <pre class="secondary">
+      # yum update --security
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      yum update --security
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'changed' if (task01.changed) else 'passed'}}"
+  when: is_remediate
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation

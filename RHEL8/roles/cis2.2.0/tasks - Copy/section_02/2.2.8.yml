@@ -1,0 +1,13 @@
+---
+
+- name: 2.2.8|Ensure DNS Server is not enabled 
+  service:
+    name: named
+    state: stopped
+    enabled: no   
+  when: named_service_status.stdout == "loaded"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE

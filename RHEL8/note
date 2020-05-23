@@ -1,0 +1,9 @@
+ansible-playbook hardeningscript.yml -i inventory --extra-vars '{is_remediate: false}' --check"
+
+ansible-playbook hardeningscript.yml-i inventory 	 --skip-tags 'IGNORE' --extra-vars '{is_remediate: true}'", 
+
+
+ansible-playbook hardeningscript.yml -i inventory --extra-vars '{is_remediate: false}' --check"
+
+ansible-playbook hardeningscript.yml -i inventory --extra-vars '{is_remediate: true}'
+

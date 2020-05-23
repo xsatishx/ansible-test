@@ -1,0 +1,13 @@
+---
+
+- name: 2.2.15|Ensure mail transfer agent is configured for local-only mode 
+  lineinfile:
+    path: /etc/postfix/main.cf
+    regexp: "^(#)?inet_interfaces"
+    line: "inet_interfaces = loopback-only"
+  notify: Restart postfix
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE

@@ -1,0 +1,24 @@
+---
+
+- name: 5.4.1.2|Ensure minimum days between password changes is 7 or more 
+  lineinfile:
+    state: present
+    path: /etc/login.defs
+    regexp: "PASS_MIN_DAYS\\s+"
+    line: "PASS_MIN_DAYS {{ cis_pass['min_days'] }}"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 
+
+- name: 5.4.1.2|Ensure minimum days between password changes is 7 or more 
+  shell: "chage --mindays {{ cis_pass['min_days'] }} {{ item }}"
+  with_items: "{{ task_5_4_1_1.stdout_lines|default([]) }}"
+  check_mode: no
+  changed_when: no
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 

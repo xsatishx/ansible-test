@@ -1,0 +1,76 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.2.1|task01
+  shell: yum repolist
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance
+
+- name: 1.2.1|task01
+  set_fact:
+    is_valid01: '{{ task01.stdout_lines | select("match", "^repolist:.+") | join("") | replace("repolist: ", "") | replace(",", "") | int > 0}}'
+  when: is_compliance
+
+- name: 1.2.1|Ensure package manager repositories are configured
+  moveit:
+    section: 1.2.1
+    description: Ensure package manager repositories are configured
+    info: |
+      <pre class="primary">
+      Run the following command and verify repositories are configured correctly:
+      </pre>
+      <pre class="secondary">
+      # yum repolist
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      yum repolist
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if is_valid01 else 'failed' }}"
+  when: is_compliance
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.2.1|Ensure package manager repositories are configured
+  moveit:
+    section: 1.2.1
+    description: Ensure package manager repositories are configured
+    info: |
+      <pre class="primary">
+      Configure your package manager repositories according to site policy:
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      Manual intervention required for partition-related controls.
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "manual"
+  when: is_remediate
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation

@@ -1,0 +1,132 @@
+---
+
+###############
+#    Audit    #
+###############
+
+- name: 1.7.1.1|task01
+  shell: cat /etc/motd
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: audit_1
+  when: is_compliance
+
+- name: 1.7.1.1|Ensure message of the day is configured properly
+  moveit:
+    section: 1.7.1.1
+    description: Ensure message of the day is configured properly
+    info: |
+      <pre class="primary">
+      Run the following command and verify that the contents match site policy:
+      </pre>
+      <pre class="secondary">
+      # cat /etc/motd
+      </pre>
+      <pre class="primary">
+      Run the following command and verify no results are returned:
+      </pre>
+      <pre class="secondary">
+      # egrep '(\\v|\\r|\\m|\\s)' /etc/motd
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      cat /etc/motd
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ audit_1.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'passed' if audit_1.stdout_lines|length > 0 else 'failed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+
+- name: 1.7.1.1|task02
+  shell: egrep '(\\v|\\r|\\m|\\s)' /etc/motd | /usr/bin/awk '{print} END {if (NR == 0) print "passed"}'
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: audit_2
+  when: is_compliance
+
+- name: 1.7.1.1|task03
+  template:
+    src: etc/motd.j2
+    dest: /etc/motd
+  register: remediate_1
+  when: is_remediate or is_compliance
+
+- name: 1.7.1.1|Ensure message of the day is configured properly
+  moveit:
+    section: 1.7.1.1
+    description: Ensure message of the day is configured properly
+    info: |
+      <pre class="primary">
+      Run the following command and verify that the contents match site policy:
+      </pre>
+      <pre class="secondary">
+      # cat /etc/motd
+      </pre>
+      <pre class="primary">
+      Run the following command and verify no results are returned:
+      </pre>
+      <pre class="secondary">
+      # egrep '(\\v|\\r|\\m|\\s)' /etc/motd
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      egrep '(\\v|\\r|\\m|\\s)' /etc/motd
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ audit_2.stdout_lines | difference(["passed"]) | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'failed' if 'passed' not in audit_2.stdout_lines or remediate_1.changed else 'passed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.7.1.1|Ensure message of the day is configured properly
+  moveit:
+    section: 1.7.1.1
+    description: Ensure message of the day is configured properly
+    info: |
+      <pre class="primary">
+      Edit the /etc/motd file with the appropriate contents according to your site policy, remove any instances of \m , \r , \s , or \v.
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      /etc/motd file is changed
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'changed' if remediate_1.changed else 'passed' }}"
+  when: is_remediate
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation

@@ -1,0 +1,14 @@
+---
+
+- name: 4.2.2.4|Ensure syslog-ng is configured to send logs to a remote log host 
+  lineinfile:
+    regexp: "^(#)?destination logserver"
+    line: "destination logserver { tcp(\"{{ cis_rsyslog_remote_loghost_address }}\" port(514)); }; \nlog { source(src); destination(logserver); };"
+    path: /etc/syslog-ng/syslog-ng.conf
+  when: cis_enable_syslog_ng
+  notify: restart syslog-ng
+  tags:
+    - not_scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE    

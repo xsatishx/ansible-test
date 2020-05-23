@@ -1,0 +1,23 @@
+---
+
+- name: 1.1.7|Check /var/tmp exist
+  set_fact:
+    var_tmp_exist: "{{ '/var/tmp' in  mountpoints }}"
+  tags:
+    - SET_FACT
+    
+- name: 1.1.7|Ensure separate partition exists for /var/tmp
+  debug:
+    msg: |
+      {% if var_tmp_exist %}
+        OK
+      {% else %}
+        Manually task
+      {% endif %}
+  changed_when: not var_tmp_exist
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation
+    - RULE    
+    - MANUAL

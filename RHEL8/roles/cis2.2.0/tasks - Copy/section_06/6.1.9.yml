@@ -1,0 +1,13 @@
+---
+
+- name: 6.1.9|Ensure permissions on /etc/gshadow- are configured 
+  file:
+    dest: /etc/gshadow-
+    owner: root
+    group: root
+    mode: 0000
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 

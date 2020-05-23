@@ -1,0 +1,11 @@
+---
+
+- name: 3.4.1|Ensure TCP Wrappers is installed 
+  yum:
+    name: tcp_wrappers
+    state: present
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE

@@ -1,0 +1,14 @@
+---
+
+- name: 4.2.1.4|Ensure rsyslog is configured to send logs to a remote log host 
+  lineinfile:
+    regexp: "^#?\\*\\.\\*\\s+"
+    line: "*.* @@{{ cis_rsyslog_remote_loghost_address }}"
+    path: "/etc/rsyslog.conf"
+  notify: restart rsyslog
+  when: cis_enable_rsyslog
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE   

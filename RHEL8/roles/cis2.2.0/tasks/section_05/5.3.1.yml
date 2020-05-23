@@ -1,0 +1,51 @@
+---
+
+- name: 5.3.1|Ensure password creation requirements are configured 
+  lineinfile:
+    state: present
+    path: /etc/security/pwquality.conf
+    regexp: "^{{ item.key }}"
+    line: '{{ item.key }}={{ item.value }}'
+  with_items:
+    - { key: 'minlen', value: '{{ cis_pwquality_minlen }}' }
+    - { key: 'dcredit', value: '{{ cis_pwquality_dcredit }}' }
+    - { key: 'ucredit', value: '{{ cis_pwquality_ucredit }}' }
+    - { key: 'ocredit', value: '{{ cis_pwquality_ocredit }}' }
+    - { key: 'lcredit', value: '{{ cis_pwquality_lcredit }}' }
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 
+
+- name: 5.3.1|Ensure password creation requirements are configured 
+  pamd:
+    name: system-auth
+    type: password
+    control: requisite
+    module_path: pam_pwquality.so
+    module_arguments: 
+      - try_first_pass
+      - retry={{ cis_lockout['pwretry_number']|trim }}
+    state: updated
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE 
+
+- name: 5.3.1|Ensure password creation requirements are configured 
+  pamd:
+    name: password-auth
+    type: password
+    control: requisite
+    module_path: pam_pwquality.so
+    module_arguments: 
+      - try_first_pass
+      - retry={{ cis_lockout['pwretry_number']|trim }}
+    state: updated
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE   

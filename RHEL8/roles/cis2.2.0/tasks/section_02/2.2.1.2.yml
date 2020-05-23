@@ -1,0 +1,41 @@
+---
+
+- name: 2.2.1.2|Ensure ntp is configured
+  template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
+  notify: Restart ntpd
+  when: cis_time_synchronization == "ntp"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE
+
+- name: 2.2.1.2|Ensure ntp is configured
+  lineinfile:
+    path: /etc/sysconfig/ntpd
+    regexp: "^(#)?OPTIONS"
+    line: "OPTIONS=\"-u ntp:ntp\""
+  when: cis_time_synchronization == "ntp"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE
+
+- name: 2.2.1.2|Ensure ntp is configured
+  lineinfile:
+    path: /usr/lib/systemd/system/ntpd.service
+    regexp: "^(#)?ExecStart"
+    line: "ExecStart=/usr/sbin/ntpd -u ntp:ntp $OPTIONS"
+  when: cis_time_synchronization == "ntp"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE

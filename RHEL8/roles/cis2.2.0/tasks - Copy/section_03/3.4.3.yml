@@ -1,0 +1,12 @@
+---
+
+- name: 3.4.3|Ensure /etc/hosts.deny is configured 
+  lineinfile:
+    path: /etc/hosts.deny
+    regexp: "^(#)?ALL"
+    line: "ALL: ALL"
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE    

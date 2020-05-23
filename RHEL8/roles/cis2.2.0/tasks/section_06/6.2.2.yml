@@ -1,0 +1,11 @@
+---
+
+- name: 6.2.2|Ensure no legacy "+" entries exist in /etc/passwd 
+  replace:
+    dest: "/etc/passwd"
+    regexp: "^\\+:.*\n"
+  tags:
+    - scored
+    - Level_Server
+    - Level_Workstation
+    - RULE 

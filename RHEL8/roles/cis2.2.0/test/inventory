@@ -1,0 +1,8 @@
+[RHEL]
+10.10.14.13
+
+[RHEL:vars]
+ansible_connection=ssh
+ansible_user=admin
+ansible_ssh_pass=P@ssw0rdlinux
+ansible_sudo_pass=P@ssw0rdlinux
