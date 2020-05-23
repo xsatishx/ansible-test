@@ -1,5 +1,5 @@
 ---
-
+#SB
 - name: 1.1.3|task01
   set_fact:
     tmp_partition_opt: "{{ tmp_partition_opt + ['nodev'] }}"

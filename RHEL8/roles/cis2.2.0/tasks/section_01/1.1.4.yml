@@ -1,5 +1,5 @@
 ---
-
+#SB
 - name: 1.1.4|set fact
   set_fact:
     tmp_partition_opt: "{{ tmp_partition_opt + ['nosuid' ] }}"  

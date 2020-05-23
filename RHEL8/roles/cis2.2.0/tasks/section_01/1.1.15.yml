@@ -1,5 +1,5 @@
 ---
-
+#SB
 # - name: 1.1.15|Check /dev/shm exist
 #   set_fact:
 #     dev_shm_exist: "{{ '/dev/shm' in  mountpoints }}"

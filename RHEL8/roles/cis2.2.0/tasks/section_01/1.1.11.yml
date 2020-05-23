@@ -1,5 +1,5 @@
 ---
-
+#SB
 - name: 1.1.11|task01
   set_fact:
     var_log_exist: "{{ '/var/log' in  mountpoints }}"

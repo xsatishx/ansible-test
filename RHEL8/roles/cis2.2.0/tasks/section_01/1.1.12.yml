@@ -1,5 +1,5 @@
 ---
-
+#SB
 - name: 1.1.12|task01
   set_fact:
     var_log_audit_exist: "{{ '/var/log/audit' in  mountpoints }}"

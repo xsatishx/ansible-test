@@ -1,5 +1,5 @@
 ---
-
+#SB
 - name: 1.1.6|Ensure separate partition exists for /var
   set_fact:
     var_exist: "{{ '/var' in  mountpoints }}"

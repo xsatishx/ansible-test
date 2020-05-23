@@ -1,5 +1,5 @@
 ---
-
+#SB
 - name: 1.1.7|Check /var/tmp exist
   set_fact:
     var_tmp_exist: "{{ '/var/tmp' in  mountpoints }}"
