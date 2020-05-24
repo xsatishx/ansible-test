@@ -15,7 +15,7 @@
 - name: 1.1.23| Disable USB Storage
   moveit:
     section: 1.1.23
-    description: Ensure USB storage is disabled - modprobe
+    description: Disable USB Storage - modprobe
     info: |
       <pre class="primary">
       Run the following commands and verify the output is as indicated:
@@ -45,7 +45,7 @@
   tags:
     - scored
     - Level1_Server
-    - Level1_Workstation
+    - Level2_Workstation
 
 - name: 1.1.23|task02
   shell: /usr/sbin/lsmod | /usr/bin/grep usb-storage | /usr/bin/awk 'END {if (NR == 0) print "passed" ; else print "failed"}'
@@ -58,7 +58,7 @@
 - name: 1.1.23| Disable USB Storage
   moveit:
     section: 1.1.23
-    description: Ensure USB storage is disabled - lsmod
+    description: Disable USB Storage - lsmod
     info: |
       <pre class="primary">
       Run the following commands and verify the output is as indicated:
@@ -88,7 +88,7 @@
   tags:
     - scored
     - Level1_Server
-    - Level1_Workstation
+    - Level2_Workstation
 
 ###############
 # Remediation #
@@ -110,10 +110,10 @@
   register: task04
   when: is_remediate
 
-- name: 1.1.23|Ensure USB storage is disabled 
+- name: 1.1.23|Disable USB Storage 
   moveit:
     section: 1.1.23
-    description: Ensure USB storage is disabled - modprobe
+    description: Disable USB Storage - modprobe
     info: |
       <pre class="primary">
       Edit or create the file /etc/modprobe.d/usb-storage.conf and add the following line:
@@ -143,7 +143,7 @@
   tags:
     - scored
     - Level1_Server
-    - Level1_Workstation
+    - Level2_Workstation
 
 - name: 1.1.23|task05
   modprobe:
@@ -152,10 +152,10 @@
   register: task05
   when: is_remediate
 
-- name: 1.1.23|Ensure USB storage is disabled
+- name: 1.1.23|Disable USB Storage
   moveit:
     section: 1.1.23
-    description: Ensure USB storage is disabledd - lsmod
+    description: Disable USB Storaged - lsmod
     info: |
       <pre class="primary">
       Edit or create the file /etc/modprobe.d/usb-storage.conf and add the following line:
@@ -182,4 +182,4 @@
   tags:
     - scored
     - Level1_Server
-    - Level1_Workstation
+    - Level2_Workstation

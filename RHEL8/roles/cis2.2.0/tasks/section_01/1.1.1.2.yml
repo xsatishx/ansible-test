@@ -43,9 +43,9 @@
     state: "{{ 'passed' if ('install /bin/true' in task01.stdout_lines|trim) else 'failed' }}"
   when: is_compliance
   tags:
-    - scored
-    - Level1_Server
-    - Level1_Workstation
+    - not_scored
+    - Level2_Server
+    - Level2_Workstation
 
 - name: 1.1.1.2|task02
   shell: /usr/sbin/lsmod | /usr/bin/grep vfat | /usr/bin/awk 'END {if (NR == 0) print "passed" ; else print "failed"}'
@@ -86,9 +86,9 @@
     state: "{{ task02.stdout }}"
   when: is_compliance
   tags:
-    - scored
-    - Level1_Server
-    - Level1_Workstation
+    - not_scored
+    - Level2_Server
+    - Level2_Workstation
 
 ###############
 # Remediation #
@@ -132,9 +132,9 @@
     state: "{{ 'changed' if task03.changed else 'passed' }}"
   when: is_remediate
   tags:
-    - scored
-    - Level1_Server
-    - Level1_Workstation
+    - not_scored
+    - Level2_Server
+    - Level2_Workstation
 
 # $ rmmod vfat
 - name: 1.1.1.2|task04
@@ -172,6 +172,6 @@
     state: "{{ 'changed' if task04.changed else 'passed' }}"
   when: is_remediate
   tags:
-    - scored
-    - Level1_Server
-    - Level1_Workstation
+    - not_scored
+    - Level2_Server
+    - Level2_Workstation

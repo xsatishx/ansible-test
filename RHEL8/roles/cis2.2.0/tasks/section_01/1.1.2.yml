@@ -19,10 +19,10 @@
   register: task02
   when: is_compliance
 
-- name: 1.1.2|Ensure separate partition exists for /tmp
+- name: 1.1.2|Ensure /tmp is configured
   moveit:
     section: 1.1.2
-    description: Ensure separate partition exists for /tmp
+    description: Ensure /tmp is configured
     info: |
       <pre class="primary">
       Run the following command and verify output shows /tmp is mounted:
@@ -49,17 +49,17 @@
   when: is_compliance
   tags:
     - scored
-    - Level2_Server
-    - Level2_Workstation
+    - Level1_Server
+    - Level1_Workstation
 
 ###############
 # Remediation #
 ###############
 
-- name: 1.1.2|Ensure separate partition exists for /tmp
+- name: 1.1.2|Ensure /tmp is configured
   moveit:
     section: 1.1.2
-    description: Ensure separate partition exists for /tmp
+    description: Ensure /tmp is configured
     info: |
       <pre class="primary">
       For new installations, during installation create a custom partition setup and specify aseparate partition for /tmp.
@@ -86,5 +86,5 @@
   when: is_remediate
   tags:
     - scored
-    - Level2_Server
-    - Level2_Workstation
+    - Level1_Server
+    - Level1_Workstation

@@ -1,11 +1,11 @@
 ---
-
+#SB
 ###############
 #    Audit    #
 ###############
 
 - name: 1.2.1|task01
-  shell: yum repolist
+  shell: /usr/bin/subscription-manager identity
   args:
     warn: no
   check_mode: no
@@ -14,28 +14,24 @@
   register: task01
   when: is_compliance
 
-- name: 1.2.1|task01
-  set_fact:
-    is_valid01: '{{ task01.stdout_lines | select("match", "^repolist:.+") | join("") | replace("repolist: ", "") | replace(",", "") | int > 0}}'
-  when: is_compliance
-
-- name: 1.2.1|Ensure package manager repositories are configured
+- name: 1.2.1|Ensure Red Hat Subscription Manager connection is configured
   moveit:
     section: 1.2.1
-    description: Ensure package manager repositories are configured
+    description: Ensure Red Hat Subscription Manager connection is configured
     info: |
       <pre class="primary">
-      Run the following command and verify repositories are configured correctly:
+      Verify your system is connected to the Red Hat Subscription Manager.
+      If connected to RHSM your systemID can be retrieved with the following command:
       </pre>
       <pre class="secondary">
-      # yum repolist
+      # subscription-manager identity
       </pre>
     cmd_output: |
       <pre class="primary">
       <b>Command executed:</b>
       </pre>
       <pre class="secondary">
-      yum repolist
+      subscription-manager identity
       </pre>
       <pre class="primary">
       <b>Output:</b>
@@ -44,7 +40,7 @@
       {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
       </pre>
     isRemediate: "{{ is_remediate }}"
-    state: "{{ 'passed' if is_valid01 else 'failed' }}"
+    state: "{{ 'passed' if task01.rc == 0 else 'failed' }}"
   when: is_compliance
   tags:
     - not_scored
@@ -55,17 +51,20 @@
 # Remediation #
 ###############
 
-- name: 1.2.1|Ensure package manager repositories are configured
+- name: 1.2.1|Ensure Red Hat Subscription Manager connection is configured
   moveit:
     section: 1.2.1
-    description: Ensure package manager repositories are configured
+    description: Ensure Red Hat Subscription Manager connection is configured
     info: |
       <pre class="primary">
-      Configure your package manager repositories according to site policy:
+      Run the following command to connect to the Red Hat Subscription Manager:
+      </pre>
+      <pre class="secondary">
+      # subscription-manager register
       </pre>
     cmd_output: |
       <pre class="primary">
-      Manual intervention required for partition-related controls.
+      Manual Intervention Required.
       </pre>
     isRemediate: "{{ is_remediate }}"
     state: "manual"

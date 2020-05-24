@@ -1,7 +1,7 @@
 ###############
 #    Audit    #
 ###############
-
+#SB
 - name: 1.2.3|task01
   shell: /usr/bin/rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --> %{summary}\n'
   args:
