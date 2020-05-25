@@ -60,6 +60,7 @@ cis_aide_cron:
 
 # 1.4.1
 cis_grub_bootloader_filename: "/boot/grub2/grub.cfg"
+cis_grubenv_bootloader_filename: "/boot/grub2/grubenv"
 cis_user_bootloader_filename: "/boot/grub2/user.cfg"
 
 # 1.4.2 Bootloader password

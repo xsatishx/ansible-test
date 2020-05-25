@@ -1,11 +1,12 @@
 ---
-
+# SB
+# VERIFY
 ###############
 #    Audit    #
 ###############
 
 - name: 1.3.1|task01
-  shell: rpm -q aide
+  shell: rpm -q sudo
   args:
     warn: no
   check_mode: no
@@ -16,29 +17,29 @@
 
 - name: 1.3.1|task02
   yum:
-    name: aide
+    name: sudo
     state: present
   register: task02
   when: is_compliance or is_remediate
 
-- name: 1.3.1|Ensure AIDE is installed
+- name: 1.3.1|Ensure SUDO is installed
   moveit:
     section: 1.3.1
-    description: Ensure AIDE is installed
+    description: Ensure SUDO is installed
     info: |
       <pre class="primary">
-      Run the following command and verify aide is installed:
+      Run the following command and verify sudo is installed:
       </pre>
       <pre class="secondary">
-      # rpm -q aide
-      aide-&lt;version&gt;
+      # rpm -q sudo
+      sudo-&lt;version&gt;
       </pre>
     cmd_output: |
       <pre class="primary">
       <b>Command executed:</b>
       </pre>
       <pre class="secondary">
-      rpm -q aide
+      rpm -q sudo
       </pre>
       <pre class="primary">
       <b>Output:</b>
@@ -58,57 +59,28 @@
 # Remediation #
 ###############
 
-- name: 1.3.1|task03
-  stat:
-    path: "{{ cis_aide_database_filename }}"
-  register: task03
-  when: is_remediate
-
-- name: 1.3.1|task04
-  shell: "{{ item }}"
-  args:
-    warn: no
-  with_items:
-    - "aide --init"
-    - "mv {{ cis_aide_src_database_filename }} {{ cis_aide_database_filename }}"
-  when:
-    - is_remediate
-    - not task03.stat.exists
-  check_mode: no
-  changed_when: no
-  failed_when: no
-  register: task04
-
-- name: 1.3.1|Ensure AIDE is installed
+- name: 1.3.1|Ensure SUDO is installed
   moveit:
     section: 1.3.1
-    description: Ensure AIDE is installed
+    description: Ensure SUDO is installed
     info: |
       <pre class="primary">
-      Run the following command to install aide :
+      Run the following command to install sudo :
       </pre>
       <pre class="secondary">
-      # yum install aide
+      # dnf install sudo
       </pre>
 
-      <pre class="primary">
-      Initialize AIDE:
-      </pre>
-      <pre class="secondary">
-      # aide --init
-      # mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
-      </pre>
     cmd_output: |
       {% if task02.changed %}
       <pre class="primary">
       <b>Command executed:</b>
       </pre>
       <pre class="secondary">
-      # yum install aide
+      # dnf install sudo
       </pre>
       {% endif %}
 
-      {% for item task04.results %}
       {% if item.changed %}
       <pre class="primary">
       <b>Command executed:</b>
@@ -117,7 +89,6 @@
       {{item.cmd}}
       </pre>
       {% endif %}
-      {% endfor %}
     isRemediate: "{{ is_remediate }}"
     state: "{{ 'changed' if task02.changed or task04.changed else 'passed'}}"
   when: is_remediate
