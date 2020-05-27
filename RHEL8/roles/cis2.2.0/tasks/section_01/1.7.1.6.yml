@@ -1,7 +1,11 @@
 ---
+#SB
+###############
+#    Audit    #
+###############
 
 - name: 1.7.1.6|task01
-  shell: ls -al /etc/issue.net
+  shell: rpm -q setroubleshoot
   args:
     warn: no
   check_mode: no
@@ -11,33 +15,28 @@
   when: is_compliance
 
 - name: 1.7.1.6|task02
-  file:
-    dest: /etc/issue.net
-    state: file
-    owner: root
-    group: root
-    mode: 0644
-  register: task02
-  when: is_compliance or is_remediate
+  set_fact:
+    is_installed: '{{ not task01.stdout is regex("not installed") }}'
+  when: is_compliance
 
-- name: 1.7.1.6|Ensure permissions on /etc/issue.net are configured
+- name: 1.7.1.6|Ensure SETroubleshoot is not installed
   moveit:
     section: 1.7.1.6
-    description: Ensure permissions on /etc/issue.net are configured
+    description: Ensure SETroubleshoot is not installed
     info: |
       <pre class="primary">
-      Run the following command and verify Uid and Gid are both 0/root and Access is 644 :
+      Run the following command and verify setroubleshoot is not installed:
       </pre>
       <pre class="secondary">
-      # stat /etc/issue.net
-      Access: (0644/-rw-r--r--) Uid: ( 0/ root) Gid: ( 0/ root)
+      # rpm -q setroubleshoot
+      package setroubleshoot is not installed
       </pre>
     cmd_output: |
       <pre class="primary">
       <b>Command executed:</b>
       </pre>
       <pre class="secondary">
-      # ls -al /etc/issue.net
+      rpm -q setroubleshoot
       </pre>
       <pre class="primary">
       <b>Output:</b>
@@ -46,41 +45,44 @@
       {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
       </pre>
     isRemediate: "{{ is_remediate }}"
-    state: "{{ 'failed' if task02.changed else 'passed'}}"
+    state: "{{ 'failed' if is_installed else 'passed' }}"
   when: is_compliance
   tags:
     - scored
-    - Level1_Server
-    - Level1_Workstation
+    - Level2_Server
 
 ###############
 # Remediation #
 ###############
 
-- name: 1.7.1.6|Ensure permissions on /etc/issue.net are configured
+- name: 1.7.1.6|task03
+  yum:
+    name: setroubleshoot
+    state: absent
+  register: task03
+  when: is_remediate
+
+- name: 1.7.1.6|Ensure SETroubleshoot is not installed
   moveit:
     section: 1.7.1.6
-    description: Ensure permissions on /etc/issue.net are configured
+    description: Ensure SETroubleshoot is not installed
     info: |
       <pre class="primary">
-      Run the following commands to set permissions on /etc/issue.net :
+      Run the following command to uninstall s etroubleshoot :
       </pre>
       <pre class="secondary">
-      # chown root:root /etc/issue.net
-      # chmod 644 /etc/issue.net
+      # dnf remove setroubleshoot
       </pre>
     cmd_output: |
       <pre class="primary">
-      <b>Command executed:</b>
+      Following commands executed
       </pre>
       <pre class="secondary">
-      # chown root:root /etc/issue.net
-      # chmod 644 /etc/issue.net
+      dnf remove setroubleshoot
       </pre>
     isRemediate: "{{ is_remediate }}"
-    state: "{{ 'changed' if task02.changed else 'passed'}}"
+    state: "{{ 'changed' if task03.changed else 'passed' }}"
   when: is_remediate
   tags:
     - scored
-    - Level1_Server
-    - Level1_Workstation
+    - Level2_Server

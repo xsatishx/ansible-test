@@ -1,132 +1,209 @@
 ---
-
+#SB
 ###############
 #    Audit    #
 ###############
 
 - name: 1.7.1.2|task01
-  shell: cat /etc/issue
+  shell: /usr/bin/grep -E 'kernelopts=(\S+\s+)*(selinux=0|enforcing=0)+\b' /boot/grub2/grub.cfg | /usr/bin/egrep "selinux"
   args:
     warn: no
   check_mode: no
   changed_when: no
   failed_when: no
-  register: audit_1
+  register: task01
   when: is_compliance
-
-- name: 1.7.1.2|Ensure local login warning banner is configured properly
-  moveit:
-    section: 1.7.1.2
-    description: Ensure local login warning banner is configured properly
-    info: |
-      <pre class="primary">
-      Run the following command and verify that the contents match site policy:
-      </pre>
-      <pre class="secondary">
-      # cat /etc/issue
-      </pre>
-      <pre class="primary">
-      Run the following command and verify no results are returned:
-      </pre>
-      <pre class="secondary">
-      # egrep '(\\v|\\r|\\m|\\s)' /etc/issue
-      </pre>
-    cmd_output: |
-      <pre class="primary">
-      <b>Command executed:</b>
-      </pre>
-      <pre class="secondary">
-      cat /etc/issue
-      </pre>
-      <pre class="primary">
-      <b>Output:</b>
-      </pre>
-      <pre class="secondary">
-      {{ audit_1.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
-      </pre>
-    isRemediate: "{{ is_remediate }}"
-    state: "{{ 'passed' if audit_1.stdout_lines|length > 0 else 'failed' }}"
-  when: is_compliance
-  tags:
-    - not_scored
-    - Level1_Server
-    - Level1_Workstation
 
 - name: 1.7.1.2|task02
-  shell: egrep '(\\v|\\r|\\m|\\s)' /etc/issue | /usr/bin/awk '{print} END {if (NR == 0) print "passed"}'
-  args:
-    warn: no
-  check_mode: no
-  changed_when: no
-  failed_when: no
-  register: audit_2
+  set_fact:
+    is_valid01: '{{ task01.stdout_lines | select("match", ".*selinux\s*=\s*0") | list | length > 0 }}'
   when: is_compliance
 
 - name: 1.7.1.2|task03
-  template:
-    src: etc/issue.j2
-    dest: /etc/issue
-  register: remediate_1
-  when: is_remediate or is_compliance
+  shell: /usr/bin/grep -E 'kernelopts=(\S+\s+)*(selinux=0|enforcing=0)+\b' /boot/grub2/grub.cfg | /usr/bin/egrep "enforcing"
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task03
+  when: is_compliance
 
-- name: 1.7.1.2|Ensure local login warning banner is configured properly
+- name: 1.7.1.2|task04
+  set_fact:
+    is_valid02: '{{ task03.stdout_lines | select("match", ".*enforcing\s*=\s*0") | list | length > 0 }}'
+  when: is_compliance
+
+- name: 1.7.1.2|Ensure SELinux is not disabled in bootloader configuration
   moveit:
     section: 1.7.1.2
-    description: Ensure local login warning banner is configured properly
+    description: Ensure SELinux is not disabled in bootloader configuration
     info: |
       <pre class="primary">
-      Run the following command and verify that the contents match site policy:
+      Run the following command and verify that no linux line has the selinux=0 or enforcing=0 parameters set:
       </pre>
       <pre class="secondary">
-      # cat /etc/issue
-      </pre>
-      <pre class="primary">
-      Run the following command and verify no results are returned:
-      </pre>
-      <pre class="secondary">
-      # egrep '(\\v|\\r|\\m|\\s)' /etc/issue
+      # grep -E 'kernelopts=(\S+\s+)*(selinux=0|enforcing=0)+\b' /boot/grub2/grub.cfg
       </pre>
     cmd_output: |
       <pre class="primary">
       <b>Command executed:</b>
       </pre>
       <pre class="secondary">
-      egrep '(\\v|\\r|\\m|\\s)' /etc/issue
+      grep -E 'kernelopts=(\S+\s+)*(selinux=0|enforcing=0)+\b' /boot/grub2/grub.cfg | egrep "selinux"
       </pre>
       <pre class="primary">
       <b>Output:</b>
       </pre>
       <pre class="secondary">
-      {{ audit_2.stdout_lines | difference(["passed"]) | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
       </pre>
     isRemediate: "{{ is_remediate }}"
-    state: "{{ 'failed' if 'passed' not in audit_2.stdout_lines or remediate_1.changed else 'passed' }}"
+    state: "{{ 'failed' if is_valid01 else 'passed' }}"
   when: is_compliance
   tags:
-    - not_scored
-    - Level1_Server
-    - Level1_Workstation
+    - scored
+    - Level2_Server
+    - Level2_Workstation
+
+- name: 1.7.1.2|Ensure SELinux is not disabled in bootloader configuration
+  moveit:
+    section: 1.7.1.2
+    description: Ensure SELinux is not disabled in bootloader configuration
+    info: |
+      <pre class="primary">
+      Run the following command and verify that no linux line has the selinux=0 or enforcing=0 parameters set:
+      </pre>
+      <pre class="secondary">
+      # grep -E 'kernelopts=(\S+\s+)*(selinux=0|enforcing=0)+\b' /boot/grub2/grub.cfg
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      grep -E 'kernelopts=(\S+\s+)*(selinux=0|enforcing=0)+\b' /boot/grub2/grub.cfg | egrep "enforcing"
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task03.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'failed' if is_valid02 else 'passed' }}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation
 
 ###############
 # Remediation #
 ###############
 
-- name: 1.7.1.2|Ensure local login warning banner is configured properly
+- name: 1.7.1.2|task05
+  shell: /usr/bin/grep "^GRUB_CMDLINE_LINUX_DEFAULT\\s*=\\s*" /etc/default/grub
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task05
+  when:  is_remediate
+
+- name: 1.7.1.2|task06
+  lineinfile:
+    path: /etc/default/grub
+    regexp: "^GRUB_CMDLINE_LINUX_DEFAULT\\s*=\\s*"
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet"'
+  notify: generate new grub config
+  register: task06
+  when: is_remediate
+
+- name: 1.7.1.2|Ensure SELinux is not disabled in bootloader configuration
   moveit:
     section: 1.7.1.2
-    description: Ensure local login warning banner is configured properly
+    description: Ensure SELinux is not disabled in bootloader configuration
     info: |
       <pre class="primary">
-      Edit the /etc/issue file with the appropriate contents according to your site policy, remove any instances of \m , \r , \s , or \v.
+      Edit /etc/default/grub and remove all instances of selinux=0 and enforcing=0 from all CMDLINE_LINUX parameters:
+      </pre>
+      <pre class="secondary">
+      GRUB_CMDLINE_LINUX_DEFAULT="quiet"
+      GRUB_CMDLINE_LINUX=""
+      </pre>
+      <pre class="primary">
+      Run the following command to update the grub2 configuration:
+      </pre>
+      <pre class="secondary">
+      # grub2-mkconfig -o /boot/grub2/grub.cfg
       </pre>
     cmd_output: |
       <pre class="primary">
-      /etc/issue file is modified
+      Following line changed
+      </pre>
+      <pre class="secondary">
+      -- {{ task05.stdout_lines | join('<br>-- ') }}
+      ++ GRUB_CMDLINE_LINUX_DEFAULT="quiet"
       </pre>
     isRemediate: "{{ is_remediate }}"
-    state: "{{ 'changed' if remediate_1.changed else 'passed' }}"
+    state: "{{ 'changed' if task06.changed else 'passed' }}"
   when: is_remediate
   tags:
-    - not_scored
-    - Level1_Server
-    - Level1_Workstation
+    - scored
+    - Level2_Server
+    - Level2_Workstation
+
+- name: 1.7.1.2|task07
+  shell: /usr/bin/grep "^GRUB_CMDLINE_LINUX\\s*=\\s*" /etc/default/grub
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task07
+  when: is_remediate
+
+- name: 1.7.1.2|task08
+  lineinfile:
+    path: /etc/default/grub
+    regexp: "^GRUB_CMDLINE_LINUX\\s*=\\s*"
+    line: 'GRUB_CMDLINE_LINUX=""'
+  notify: generate new grub config
+  register: task08
+  when: is_remediate
+
+- name: 1.7.1.2|Ensure SELinux is not disabled in bootloader configuration
+  moveit:
+    section: 1.7.1.2
+    description: Ensure SELinux is not disabled in bootloader configuration
+    info: |
+      <pre class="primary">
+      Edit /etc/default/grub and remove all instances of selinux=0 and enforcing=0 from all CMDLINE_LINUX parameters:
+      </pre>
+      <pre class="secondary">
+      GRUB_CMDLINE_LINUX_DEFAULT="quiet"
+      GRUB_CMDLINE_LINUX=""
+      </pre>
+      <pre class="primary">
+      Run the following command to update the grub2 configuration:
+      </pre>
+      <pre class="secondary">
+      # grub2-mkconfig -o /boot/grub2/grub.cfg
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      Following line changed
+      </pre>
+      <pre class="secondary">
+      -- {{ task07.stdout_lines | join('<br>-- ') }}
+      ++ GRUB_CMDLINE_LINUX=""
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'changed' if task08.changed else 'passed' }}"
+  when: is_remediate
+  tags:
+    - scored
+    - Level2_Server
+    - Level2_Workstation

@@ -1,132 +1,90 @@
 ---
-
+#SB
 ###############
 #    Audit    #
 ###############
 
 - name: 1.7.1.1|task01
-  shell: cat /etc/motd
+  shell: rpm -q libselinux
   args:
     warn: no
   check_mode: no
   changed_when: no
   failed_when: no
-  register: audit_1
+  register: task01
   when: is_compliance
-
-- name: 1.7.1.1|Ensure message of the day is configured properly
-  moveit:
-    section: 1.7.1.1
-    description: Ensure message of the day is configured properly
-    info: |
-      <pre class="primary">
-      Run the following command and verify that the contents match site policy:
-      </pre>
-      <pre class="secondary">
-      # cat /etc/motd
-      </pre>
-      <pre class="primary">
-      Run the following command and verify no results are returned:
-      </pre>
-      <pre class="secondary">
-      # egrep '(\\v|\\r|\\m|\\s)' /etc/motd
-      </pre>
-    cmd_output: |
-      <pre class="primary">
-      <b>Command executed:</b>
-      </pre>
-      <pre class="secondary">
-      cat /etc/motd
-      </pre>
-      <pre class="primary">
-      <b>Output:</b>
-      </pre>
-      <pre class="secondary">
-      {{ audit_1.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
-      </pre>
-    isRemediate: "{{ is_remediate }}"
-    state: "{{ 'passed' if audit_1.stdout_lines|length > 0 else 'failed' }}"
-  when: is_compliance
-  tags:
-    - scored
-    - Level1_Server
-    - Level1_Workstation
 
 - name: 1.7.1.1|task02
-  shell: egrep '(\\v|\\r|\\m|\\s)' /etc/motd | /usr/bin/awk '{print} END {if (NR == 0) print "passed"}'
-  args:
-    warn: no
-  check_mode: no
-  changed_when: no
-  failed_when: no
-  register: audit_2
+  set_fact:
+    is_installed: '{{ not task01.stdout is regex("not installed") }}'
   when: is_compliance
 
-- name: 1.7.1.1|task03
-  template:
-    src: etc/motd.j2
-    dest: /etc/motd
-  register: remediate_1
-  when: is_remediate or is_compliance
-
-- name: 1.7.1.1|Ensure message of the day is configured properly
+- name: 1.7.1.1|Ensure SELinux is installed
   moveit:
     section: 1.7.1.1
-    description: Ensure message of the day is configured properly
+    description: Ensure SELinux is installed
     info: |
       <pre class="primary">
-      Run the following command and verify that the contents match site policy:
+      Run the following command and verify libselinux is installed:
       </pre>
       <pre class="secondary">
-      # cat /etc/motd
-      </pre>
-      <pre class="primary">
-      Run the following command and verify no results are returned:
-      </pre>
-      <pre class="secondary">
-      # egrep '(\\v|\\r|\\m|\\s)' /etc/motd
+      # rpm -q libselinux
+      libselinux-<version>
       </pre>
     cmd_output: |
       <pre class="primary">
       <b>Command executed:</b>
       </pre>
       <pre class="secondary">
-      egrep '(\\v|\\r|\\m|\\s)' /etc/motd
+      rpm -q libselinux
       </pre>
       <pre class="primary">
       <b>Output:</b>
       </pre>
       <pre class="secondary">
-      {{ audit_2.stdout_lines | difference(["passed"]) | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
       </pre>
     isRemediate: "{{ is_remediate }}"
-    state: "{{ 'failed' if 'passed' not in audit_2.stdout_lines or remediate_1.changed else 'passed' }}"
+    state: "{{ 'passed' if is_installed else 'failed' }}"
   when: is_compliance
   tags:
     - scored
-    - Level1_Server
-    - Level1_Workstation
+    - Level2_Server
+    - Level2_Workstation
 
 ###############
 # Remediation #
 ###############
 
-- name: 1.7.1.1|Ensure message of the day is configured properly
+- name: 1.7.1.1|task03
+  yum:
+    name: libselinux
+    state: present
+  register: task03
+  when: is_remediate
+
+- name: 1.7.1.1|Ensure SELinux is installed
   moveit:
     section: 1.7.1.1
-    description: Ensure message of the day is configured properly
+    description: Ensure SELinux is installed
     info: |
       <pre class="primary">
-      Edit the /etc/motd file with the appropriate contents according to your site policy, remove any instances of \m , \r , \s , or \v.
+      Run the following command to install libselinux :
+      </pre>
+      <pre class="secondary">
+      # dnf install libselinux
       </pre>
     cmd_output: |
       <pre class="primary">
-      /etc/motd file is changed
+      Following command executed
+      </pre>
+      <pre class="secondary">
+      dnf install libselinux
       </pre>
     isRemediate: "{{ is_remediate }}"
-    state: "{{ 'changed' if remediate_1.changed else 'passed' }}"
+    state: "{{ 'changed' if task03.changed else 'passed' }}"
   when: is_remediate
   tags:
     - scored
-    - Level1_Server
-    - Level1_Workstation
+    - Level2_Server
+    - Level2_Workstation

@@ -1,11 +1,11 @@
 ---
-
+#SB
 ###############
 #    Audit    #
 ###############
 
-- name: 1.6.1.4|task01
-  shell: rpm -q setroubleshoot
+- name: 1.7.1.7|task01
+  shell: rpm -q mcstrans
   args:
     warn: no
   check_mode: no
@@ -14,29 +14,29 @@
   register: task01
   when: is_compliance
 
-- name: 1.6.1.4|task02
+- name: 1.7.1.7|task02
   set_fact:
     is_installed: '{{ not task01.stdout is regex("not installed") }}'
   when: is_compliance
 
-- name: 1.6.1.4|Ensure SETroubleshoot is not installed
+- name: 1.7.1.7|Ensure the MCS Translation Service (mcstrans) is not installed
   moveit:
-    section: 1.6.1.4
-    description: Ensure SETroubleshoot is not installed
+    section: 1.7.1.7
+    description: Ensure the MCS Translation Service (mcstrans) is not installed
     info: |
       <pre class="primary">
-      Run the following command and verify setroubleshoot is not installed:
+      Run the following command and verify mcstrans is not installed:
       </pre>
       <pre class="secondary">
-      # rpm -q setroubleshoot
-      package setroubleshoot is not installed
+      # rpm -q mcstrans
+      package mcstrans is not installed
       </pre>
     cmd_output: |
       <pre class="primary">
       <b>Command executed:</b>
       </pre>
       <pre class="secondary">
-      rpm -q setroubleshoot
+      rpm -q mcstrans
       </pre>
       <pre class="primary">
       <b>Output:</b>
@@ -50,35 +50,36 @@
   tags:
     - scored
     - Level2_Server
+    - Level2_Workstation
 
 ###############
 # Remediation #
 ###############
 
-- name: 1.6.1.4|task03
+- name: 1.7.1.7|task03
   yum:
-    name: setroubleshoot
+    name: mcstrans
     state: absent
   register: task03
   when: is_remediate
 
-- name: 1.6.1.4|Ensure SETroubleshoot is not installed
+- name: 1.7.1.7|Ensure the MCS Translation Service (mcstrans) is not installed
   moveit:
-    section: 1.6.1.4
-    description: Ensure SETroubleshoot is not installed
+    section: 1.7.1.7
+    description: Ensure the MCS Translation Service (mcstrans) is not installed
     info: |
       <pre class="primary">
       Run the following command to uninstall s etroubleshoot :
       </pre>
       <pre class="secondary">
-      # yum remove setroubleshoot
+      # dnf remove mcstrans
       </pre>
     cmd_output: |
       <pre class="primary">
-      Following commands executed
+      <b>Command executed:</b>
       </pre>
       <pre class="secondary">
-      yum remove setroubleshoot
+      dnf remove mcstrans
       </pre>
     isRemediate: "{{ is_remediate }}"
     state: "{{ 'changed' if task03.changed else 'passed' }}"
@@ -86,3 +87,4 @@
   tags:
     - scored
     - Level2_Server
+    - Level2_Workstation

@@ -1,7 +1,12 @@
 ---
+#SB
+###############
+#    Audit    #
+###############
 
 - name: 1.7.1.5|task01
-  shell: ls -al /etc/issue
+  shell: |
+    /usr/bin/ps -eZ | grep unconfined_service_t END {if (NR == 0) print "none"}'
   args:
     warn: no
   check_mode: no
@@ -10,34 +15,23 @@
   register: task01
   when: is_compliance
 
-- name: 1.7.1.5|task02
-  file:
-    dest: /etc/issue
-    state: file
-    owner: root
-    group: root
-    mode: 0644
-  register: task02
-  when: is_compliance or is_remediate
-
-- name: 1.7.1.5|Ensure permissions on /etc/issue are configured
+- name: 1.7.1.5|Ensure no unconfined services exist
   moveit:
     section: 1.7.1.5
-    description: Ensure permissions on /etc/issue are configured
+    description: Ensure no unconfined services exist
     info: |
       <pre class="primary">
-      Run the following command and verify Uid and Gid are both 0/root and Access is 644 :
+      Run the following command and verify not output is produced:
       </pre>
       <pre class="secondary">
-      # stat /etc/issue
-      Access: (0644/-rw-r--r--) Uid: ( 0/ root) Gid: ( 0/ root)
+      # ps -eZ | grep unconfined_service_t
       </pre>
     cmd_output: |
       <pre class="primary">
       <b>Command executed:</b>
       </pre>
       <pre class="secondary">
-      # ls -al /etc/issue
+      (/usr/bin/ps -eZ | /usr/bin/egrep unconfined_service_t END {if (NR == 0) print "none"}')
       </pre>
       <pre class="primary">
       <b>Output:</b>
@@ -46,41 +40,33 @@
       {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
       </pre>
     isRemediate: "{{ is_remediate }}"
-    state: "{{ 'failed' if task02.changed else 'passed'}}"
+    state: "{{ 'passed' if 'none' in task01.stdout_lines else 'failed' }}"
   when: is_compliance
   tags:
     - scored
-    - Level1_Server
-    - Level1_Workstation
+    - Level2_Server
+    - Level2_Workstation
 
 ###############
 # Remediation #
 ###############
 
-- name: 1.7.1.5|Ensure permissions on /etc/issue are configured
+- name: 1.7.1.5|Ensure no unconfined services exist
   moveit:
     section: 1.7.1.5
-    description: Ensure permissions on /etc/issue are configured
+    description: Ensure no unconfined services exist
     info: |
       <pre class="primary">
-      Run the following commands to set permissions on /etc/issue :
-      </pre>
-      <pre class="secondary">
-      # chown root:root /etc/issue
-      # chmod 644 /etc/issue
+      Investigate any unconfined processes found during the audit action. They may need to have an existing security context assigned to them or a policy built for them.
       </pre>
     cmd_output: |
       <pre class="primary">
-      <b>Command executed:</b>
-      </pre>
-      <pre class="secondary">
-      # chown root:root /etc/issue
-      # chmod 644 /etc/issue
+      Manual intervention required for partition-related controls.
       </pre>
     isRemediate: "{{ is_remediate }}"
-    state: "{{ 'changed' if task02.changed else 'passed'}}"
+    state: "manual"
   when: is_remediate
   tags:
     - scored
-    - Level1_Server
-    - Level1_Workstation
+    - Level2_Server
+    - Level2_Workstation
