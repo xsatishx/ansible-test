@@ -1,0 +1,86 @@
+---
+#SB
+- name: 1.8.1.4|task01
+  shell: ls -al /etc/motd
+  args:
+    warn: no
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: task01
+  when: is_compliance
+
+- name: 1.8.1.4|task02
+  file:
+    dest: /etc/motd
+    state: file
+    owner: root
+    group: root
+    mode: 0644
+  register: task02
+  when: is_compliance or is_remediate
+
+- name: 1.8.1.4|Ensure permissions on /etc/motd are configured
+  moveit:
+    section: 1.8.1.4
+    description: Ensure permissions on /etc/motd are configured
+    info: |
+      <pre class="primary">
+      Run the following command and verify Uid and Gid are both 0/root and Access is 644 :
+      </pre>
+      <pre class="secondary">
+      # stat /etc/motd
+      Access: (0644/-rw-r--r--) Uid: ( 0/ root) Gid: ( 0/ root)
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      # ls -al /etc/motd
+      </pre>
+      <pre class="primary">
+      <b>Output:</b>
+      </pre>
+      <pre class="secondary">
+      {{ task01.stdout_lines | default(["&lt;no-output&gt;"], true) | join('<br>')}}
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'failed' if task02.changed else 'passed'}}"
+  when: is_compliance
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+
+###############
+# Remediation #
+###############
+
+- name: 1.8.1.4|Ensure permissions on /etc/motd are configured
+  moveit:
+    section: 1.8.1.4
+    description: Ensure permissions on /etc/motd are configured
+    info: |
+      <pre class="primary">
+      Run the following commands to set permissions on /etc/motd :
+      </pre>
+      <pre class="secondary">
+      # chown root:root /etc/motd
+      # chmod u-x,go-wx /etc/motd
+      </pre>
+    cmd_output: |
+      <pre class="primary">
+      <b>Command executed:</b>
+      </pre>
+      <pre class="secondary">
+      # chown root:root /etc/motd
+      # chmod u-x,go-wx /etc/motd
+      </pre>
+    isRemediate: "{{ is_remediate }}"
+    state: "{{ 'changed' if task02.changed else 'passed'}}"
+  when: is_remediate
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation

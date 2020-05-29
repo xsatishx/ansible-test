@@ -1,0 +1,11 @@
+# VERIFY  - COMPLETE? 
+---
+- name: 1.9|Ensure updates, patches, and additional security software are installed 
+  yum:
+    name: "*"
+    state: latest
+  tags:
+    - scored
+    - Level1_Server
+    - Level1_Workstation
+    - RULE  
